@@ -420,6 +420,79 @@ class SetupMenuCompetitionName(tk.Toplevel):
         self.root.focus_set()
         self.destroy()
 
+class SwissRoundNumberselector(tk.Toplevel):
+
+    def __init__(self, root,Competition,RoundNum,TitleFont, BodyFont, title = 'Select Round Number'):
+        
+        self.TitleFont = TitleFont
+        self.BodyFont = BodyFont 
+
+        tk.Toplevel.__init__(self, root)
+        self.transient(root)
+
+        if title:
+            self.title(title)
+
+        self.root = root
+        self.Competition = Competition
+        self.RoundNum = RoundNum
+        self.SelRoundNum = self.RoundNum
+        self.TKSelRoundNum = tk.IntVar(value=self.SelRoundNum ) 
+        
+
+        body = tk.Frame(self)
+        self.initial_focus = self.body(body)
+        body.grid(row = 0, column = 0)
+
+        self.wait_visibility()
+        self.grab_set()
+
+        if not self.initial_focus:
+            self.initial_focus = self
+
+        self.protocol("WM_DELETE_WINDOW", self.cancel)
+
+        self.geometry("+%d+%d" % (root.winfo_rootx()+50,
+                                  root.winfo_rooty()+50))
+
+        self.initial_focus.focus_set()
+
+        self.wait_window(self)
+
+    #
+    # construction hooks
+
+    def body(self, master):      
+        
+        for i in range(len(self.Competition.ValidSwissScores)):
+            RoundName = "Round " + str(i +1)
+            tk.Radiobutton(self, font=self.BodyFont, text=RoundName, variable=self.TKSelRoundNum, value=i+1,command=self.RadioSelect).grid(row = i, column = 0)              
+        
+
+        tk.Button(self, text="OK", width=10, command=self.ok).grid(row=len(self.Competition.ValidSwissScores) + 1, column=1)
+        tk.Button(self, text="Cancel", width=10, command=self.cancel).grid(row=len(self.Competition.ValidSwissScores) + 1, column=2)
+
+    def RadioSelect(self):
+        self.SelRoundNum = self.TKSelRoundNum.get()
+        
+    #
+    # standard button semantics
+
+    def ok(self, event=None):
+        self.withdraw()
+        self.update_idletasks()
+        self.leave()
+            
+    def leave(self):
+        self.root.focus_set()
+        self.destroy()
+
+            
+    def cancel(self, event=None):
+        
+        # put focus back to the parent window
+        self.SelRoundNum = self.RoundNum
+        self.leave()
 
 
         

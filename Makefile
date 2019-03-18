@@ -5,5 +5,5 @@ commit:
 	git commit -m "Update"
 
 push: 
-	git push origin2 MathDay
+	git push -u publicorigin master
 

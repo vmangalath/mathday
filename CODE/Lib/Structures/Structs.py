@@ -1,4 +1,6 @@
 import csv
+import random
+import copy
 from ..Functions.Functions import NextKey     
 
 class PreviousSchool:
@@ -17,12 +19,12 @@ class RegisteredSchool(PreviousSchool):
         self.Key = Key
     def __str__(self):
         return "( %s , %s , %s , %s )" %(self.Key,self.Name,self.Location,self.HistZScore)
-    def GenerateCompetitionSchool(self,GroupScores,SwissScores,SwissPartners,CrossScores,RelayScores):
-        return CompetitionSchool(self.Key,self.Name,self.Location,self.HistZScore,GroupScores,SwissScores,SwissPartners,CrossScores,RelayScores)
+    def GenerateCompetitionSchool(self,GroupScores,SwissScores,CrossScores,RelayScores,SwissPartners,SwissSites):
+        return CompetitionSchool(self.Key,self.Name,self.Location,self.HistZScore,GroupScores,SwissScores,CrossScores,RelayScores,SwissPartners,SwissSites)
 
 class CompetitionSchool(RegisteredSchool):
 
-    def __init__(self,Key,Name,Location,HistZScore,GroupScores,SwissScores,SwissPartners,CrossScores,RelayScores):
+    def __init__(self,Key,Name,Location,HistZScore,GroupScores,SwissScores,CrossScores,RelayScores,SwissPartners,SwissSites):
         
         RegisteredSchool.__init__(self,Key,Name,Location,HistZScore)
         
@@ -32,14 +34,15 @@ class CompetitionSchool(RegisteredSchool):
         self.RelayScores = RelayScores
         
         self.SwissPartners = SwissPartners
+        self.SwissSites = SwissSites
         
         self.Total = sum(self.GroupScores + self.SwissScores + self.CrossScores + self.RelayScores)
         
     def __str__(self):
-        return "( %s , %s , %s , %s , %s , %s , %s , %s , %s )" %(self.Key,self.Name,self.Location,self.HistZScore, self.GroupScores, self.SwissScores,self.SwissPartners, self.CrossScores, self.RelayScores)        
+        return "( %s , %s , %s , %s , %s , %s , %s , %s , %s , %s )" %(self.Key,self.Name,self.Location,self.HistZScore, self.GroupScores, self.SwissScores, self.CrossScores, self.RelayScores,self.SwissPartners,self.SwissSites)        
 
     def Listify(self):
-        return [self.Key,self.Name,self.Location,self.HistZScore] + self.GroupScores + self.SwissScores + self.SwissPartners + self.CrossScores + self.RelayScores
+        return [self.Key,self.Name,self.Location,self.HistZScore] + self.GroupScores + self.SwissScores + self.CrossScores + self.RelayScores + self.SwissPartners + self.SwissSites
     
     def TotalUpdate(self,ContestString=['A']):
         self.Total = 0
@@ -68,8 +71,37 @@ class CompetitionSchool(RegisteredSchool):
             elif(Contest == 'A'):
                 self.Total = self.Total + sum(self.GroupScores) + sum(self.SwissScores) + sum(self.CrossScores) + sum(self.RelayScores)
                 break
-                
             
+            
+class SwissPair:
+    def __init__(self,Site,School1Key, School2Key):
+        self.Site = Site
+        self.School1Key = School1Key
+        self.School2Key = School2Key
+    def SchoolKeyInPair(self,Key):
+        return (self.School1Key == Key) or (self.School2Key == Key)  
+    def __str__(self):
+        return "( %s , %s , %s)" %(self.Site,self.School1Key,self.School2Key)     
+
+                        
+class ListOfSwissPairs:
+    def __init__(self,SwissPairsList =[]):
+        self.SwissPairsList = SwissPairsList
+        
+    def SchoolPaired(self,Key):
+        Result = False
+        for SwissPairInst in self.SwissPairsList:   
+            if SwissPairInst.SchoolKeyInPair(Key):
+                Result=True
+                break
+        return Result
+    
+    def PrintList(self):
+        for SwissPair in self.SwissPairsList:
+            print(SwissPair)
+            
+        
+
 
 class PreviousSchoolList:
     def __init__(self,SchoolList=[],MasterFile=None):
@@ -150,11 +182,12 @@ class RegisterSchoolList:
         
 
 class CompetitionSchoolList:
-    def __init__(self,SchoolList=[],File=None,MasterDir=None):
+    def __init__(self,SchoolList=[],File=None,MasterDir=None,DataDir=None):
         
         self.SchoolList = SchoolList
         self.File = File
         self.MasterDir = MasterDir
+        self.DataDir = DataDir
         
         self.Contests = ['Group', 'Swiss', 'Cross', 'Relay']
         
@@ -169,6 +202,8 @@ class CompetitionSchoolList:
         
         self.ValidScores = [self.ValidGroupScores,self.ValidSwissScores, self.ValidCrossScores, self.ValidRelayScores]
         self.ValidNames = [self.ValidGroupNames,self.ValidSwissNames, self.ValidCrossNames, self.ValidRelayNames]
+        
+        self.ValidSwissSites = []
 
 
         self.Result = []
@@ -194,19 +229,33 @@ class CompetitionSchoolList:
         
         RegisteredSchoolList.SortList()
         
-        GroupScores = len(self.ValidGroupScores)*[0]
-        SwissScores = len(self.ValidSwissScores)*[0]
-        CrossScores = len(self.ValidCrossScores)*[0]
-        RelayScores = len(self.ValidRelayScores)*[0]
-        
-        SwissPartners = len(self.ValidSwissScores)*['']
         
         for School in RegisteredSchoolList.SchoolList:
-            self.SchoolList.append(School.GenerateCompetitionSchool(GroupScores,SwissScores,SwissPartners,CrossScores,RelayScores))
+            
+            GroupScores = len(self.ValidGroupScores)*[0]
+            SwissScores = len(self.ValidSwissScores)*[0]
+            CrossScores = len(self.ValidCrossScores)*[0]
+            RelayScores = len(self.ValidRelayScores)*[0]
+            
+            SwissPartners = len(self.ValidSwissScores)*['']
+            SwissSites = len(self.ValidSwissScores)*['']
+        
+            self.SchoolList.append(School.GenerateCompetitionSchool(GroupScores,SwissScores,CrossScores,RelayScores,SwissPartners,SwissSites))
  
     def SortList(self):
         #sort the school list by name
         self.SchoolList.sort(key=lambda School: 100*ord(School.Key[0]) + int(School.Key[1:]) )  
+    def SortListScores(self):
+        self.SchoolList.sort(key=lambda School: School.Total, reverse=True )  
+        
+    def ClearAllSwiss(self,RoundNum='1'):
+        #RoundNums from 1 to 5        
+        
+        for School in self.SchoolList:
+            School.SwissPartners[RoundNum -1] = ''
+            School.SwissSites[RoundNum -1] = ''
+            School.SwissScores[RoundNum-1]= 0
+    
     
     def WriteToFile(self):
         
@@ -219,10 +268,17 @@ class CompetitionSchoolList:
                 for j in range(len(self.ValidNames[i])):
                     nameij = self.Contests[i] + " Q" + str(self.ValidNames[i][j]) + " "
                     HeaderList.append(nameij)
-                if(i==1):
-                    for j in range(len(self.ValidNames[i])):
-                        nameij = self.Contests[i] + " Q" + str(self.ValidNames[i][j]) + " Partner"
-                        HeaderList.append(nameij)
+                        
+            #SwissAdminStuff
+            #Partners
+            for j in range(len(self.ValidNames[1])):
+                nameij = self.Contests[1] + " Q" + str(self.ValidNames[1][j]) + " Partner"
+                HeaderList.append(nameij)
+            
+            #Swiss Sites
+            for j in range(len(self.ValidNames[1])):
+                nameij = self.Contests[1] + " Q" + str(self.ValidNames[1][j]) + " Sites"
+                HeaderList.append(nameij)
                     
             writefile.writerow(HeaderList)
             
@@ -250,20 +306,25 @@ class CompetitionSchoolList:
                     for i in range(len(self.ValidScores)):
                         Scores = []
                         for j in range(len(self.ValidScores[i])):
-                            Scores.append(float(row[ijtot]))
+                            Scores.append(int(row[ijtot]))
                             ijtot = ijtot + 1
                         AllScores.append(Scores)
-                        if(i==1):
+                    
+                    #Read Swiss Partners and Sites
+                    for i in range(2):
                             Scores = []
-                            for j in range(len(self.ValidScores[i])):
+                            for j in range(len(self.ValidScores[1])):
                                 Scores.append((row[ijtot]))
                                 ijtot = ijtot + 1   
                             AllScores.append(Scores)
                             
-                    School = CompetitionSchool(Key,Name,Location,ZScore,AllScores[0],AllScores[1],AllScores[2],AllScores[3],AllScores[4])
-                    self.SchoolList.append(School)                   
+                    School = CompetitionSchool(Key,Name,Location,ZScore,AllScores[0],AllScores[1],AllScores[2],AllScores[3],AllScores[4],AllScores[5])
+                    self.SchoolList.append(School)    
+                    
                 j = j + 1 
         self.SortList()
+        self.PossibleSwissSites()
+        
     def FindKey(self,Key):
         for School in self.SchoolList:
             if(School.Key == Key):
@@ -271,17 +332,97 @@ class CompetitionSchoolList:
         return None
     def KeyInList(self,Key):
          return len(filter(lambda School: School.Key == Key, self.SchoolList)) != 0
+         
     def NameInList(self,Name):
          return len(filter(lambda School: School.Name == Name, self.SchoolList)) != 0
      
     def PrintList(self):
         for School in self.SchoolList:
             print(School)
-    """
-    def GenerateScores(self):
+            
+    def PossibleSwissSites(self):
+        self.SortList()
+        self.ValidSwissSites = []
+        for i in range(0,len(self.SchoolList),2):
+            self.ValidSwissSites.append(self.SchoolList[i].Key)
+        
+     
+    def UpdateTotalsSchool(self,ContestString=['A']):
+        
         for School in self.SchoolList:
-            self.Result.append((School.Key,School.Name))
-    """
+            School.TotalUpdate(ContestString)
+        
+    def GenerateSwissPartners(self,RoundNum=1):
+        
+        #Clear Previous Swiss Data
+        self.ClearAllSwiss(RoundNum)
+        
+        #Take Group Scores 1 through 8
+        ContestString = ['G1to8']
+        
+        for i in range(RoundNum):
+            RoundString = 'SQ' + str(i+1)
+            ContestString.append(RoundString)
+        
+        #Update Totals
+        self.UpdateTotalsSchool(ContestString)
+        
+        #Sort SchoolList in Score order (Descending)
+        self.SortListScores()
+        
+        SwissPairsListInst = ListOfSwissPairs([])
+        
+        SwissSites = copy.deepcopy(self.ValidSwissSites)
+        
+        #Find Partners
+        for School in self.SchoolList:
+                            
+                for i in range(len(School.SwissPartners)):
+                    if ( not SwissPairsListInst.SchoolPaired(School.Key)):
+                
+                        for SchoolPartner in self.SchoolList:
+                            
+                            if (SchoolPartner != School and (not SwissPairsListInst.SchoolPaired(SchoolPartner.Key)) and SchoolPartner.Key not in School.SwissPartners[i:]):
+                                SiteKey = random.choice(SwissSites)
+                                SwissSites.remove(SiteKey)
+                                SwissPairsListInst.SwissPairsList.append(SwissPair(SiteKey,School.Key,SchoolPartner.Key))
+                                break
+
+        
+        #Generated SwissPartnerList
+        #Now Update Competition Information
+        for SwissPairx in SwissPairsListInst.SwissPairsList:
+            School1 = self.FindKey(SwissPairx.School1Key)
+            
+            School1.SwissPartners[RoundNum -1] = SwissPairx.School2Key
+            School1.SwissSites[RoundNum -1] = SwissPairx.Site
+            
+            School2 = self.FindKey(SwissPairx.School2Key)
+            
+            School2.SwissPartners[RoundNum -1] = SwissPairx.School1Key
+            School2.SwissSites[RoundNum -1] = SwissPairx.Site
+        
+        #Swiss Competition Now Generated
+        #write to file
+        self.WriteToFile()
+        
+
+        
+    
+    def SwissPartnerFindBySite(self,RoundNum=1 ,site='A1'):
+        SwissPartners = []
+        for School in self.SchoolList:
+            if(School.SwissSites[RoundNum -1] == site):
+                SwissPartners.append(School)
+        
+        if len(SwissPartners) == 2:
+            return SwissPartners
+        else:
+            #print "Swiss Site Error"
+            return None
+            
+        
+
     
     """    
     def ReadFile(self):
