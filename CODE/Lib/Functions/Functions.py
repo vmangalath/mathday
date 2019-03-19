@@ -1,4 +1,5 @@
 import string
+
 def IsKey(Key):
      return ((Key[0] in string.ascii_uppercase) and ((int(Key[1:]) < 100) and (int(Key[1:]) > 0)) )
 

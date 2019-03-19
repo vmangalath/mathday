@@ -5,6 +5,7 @@ import tkMessageBox
 import tkFont
 import os
 import string
+from functools import partial
 from ..Structures.Structs import PreviousSchoolList,RegisterSchoolList
 from ..Functions.Functions import IsKey
 
@@ -384,8 +385,8 @@ class SetupMenuCompetitionName(tk.Toplevel):
         
         F1 = tk.Frame(self)
         F1.grid(row=2, column=0)       
-        tk.Button(F1, text="OK", width=10, command=self.ok).grid(row=0, column=0)
-        tk.Button(F1, text="Cancel", width=10, command=self.cancel).grid(row=0, column=1)
+        tk.Button(F1, text="OK", width=10, command=self.ok,font=self.BodyFont).grid(row=0, column=0)
+        tk.Button(F1, text="Cancel", width=10, command=self.cancel,font=self.BodyFont).grid(row=0, column=1)
 
 
         
@@ -494,5 +495,259 @@ class SwissRoundNumberselector(tk.Toplevel):
         self.SelRoundNum = self.RoundNum
         self.leave()
 
+
+
+class SchoolKeySelector(tk.Toplevel):
+
+    def __init__(self, root,Competition,CurKey,TitleFont, BodyFont, title = 'Select School By Key'):
+        
+        self.TitleFont = TitleFont
+        self.BodyFont = BodyFont 
+
+        tk.Toplevel.__init__(self, root)
+        self.transient(root)
+
+        if title:
+            self.title(title)
+
+        self.root = root
+        self.Competition = Competition
+        self.CurKey = CurKey
+        self.SelKey = self.CurKey
+        
+
+        body = tk.Frame(self)
+        self.initial_focus = self.body(body)
+        body.grid(row = 0, column = 0)
+
+        self.wait_visibility()
+        self.grab_set()
+
+        if not self.initial_focus:
+            self.initial_focus = self
+
+        self.protocol("WM_DELETE_WINDOW", self.cancel)
+
+        self.geometry("+%d+%d" % (root.winfo_rootx()+50,
+                                  root.winfo_rooty()+50))
+
+        self.initial_focus.focus_set()
+
+        self.wait_window(self)
+
+    #
+    # construction hooks
+
+    def body(self, master):         
+        
+        itot = 0
+        RowNum = 0
+        for LetterAndNum in self.Competition.KeyLetterListCondensed:
+            
+            si = itot
+            for i in range(si,si + LetterAndNum[1]):
+                KeyName = self.Competition.SchoolList[i].Key
+                GetValueLoc = partial(self.GetValue,KeyName)
+                ButTemp = tk.Button(self, text=KeyName, width=4, command=GetValueLoc)
+                ButTemp.grid(row=RowNum , column=(i - si))
+                itot = itot + 1
+            RowNum = RowNum + 1
+            
+        tk.Button(self, text="Cancel", width=10, command=self.cancel,font=self.BodyFont).grid(row=RowNum + 1, column=(i - si + 1) )
+            
+        
+            
+    def GetValue(self,Value):
+        self.SelKey = Value
+        self.ok()    
+  
+    #
+    # standard button semantics
+
+    def ok(self, event=None):
+        self.withdraw()
+        self.update_idletasks()
+        self.leave()
+            
+    def leave(self):
+        self.root.focus_set()
+        self.destroy()
+
+            
+    def cancel(self, event=None):
+        self.SelKey = self.CurKey
+        self.leave()
+        
+class SiteSelector(tk.Toplevel):
+
+    def __init__(self, root,Competition,CurKey,TitleFont, BodyFont, title = 'Select Site'):
+        
+        self.TitleFont = TitleFont
+        self.BodyFont = BodyFont 
+
+        tk.Toplevel.__init__(self, root)
+        self.transient(root)
+
+        if title:
+            self.title(title)
+
+        self.root = root
+        self.Competition = Competition
+        self.CurKey = CurKey
+        self.SelKey = self.CurKey
+        
+
+        body = tk.Frame(self)
+        self.initial_focus = self.body(body)
+        body.grid(row = 0, column = 0)
+
+        self.wait_visibility()
+        self.grab_set()
+
+        if not self.initial_focus:
+            self.initial_focus = self
+
+        self.protocol("WM_DELETE_WINDOW", self.cancel)
+
+        self.geometry("+%d+%d" % (root.winfo_rootx()+50,
+                                  root.winfo_rooty()+50))
+
+        self.initial_focus.focus_set()
+
+        self.wait_window(self)
+
+    #
+    # construction hooks
+
+    def body(self, master):         
+        
+        itot = 0
+        RowNum = 0
+        for LetterAndNum in self.Competition.SwissSitesLetterCondensed:
+            
+            si = itot
+            for i in range(si,si + LetterAndNum[1]):
+                
+                KeyName = self.Competition.ValidSwissSites[i]
+                GetValueLoc = partial(self.GetValue,KeyName)
+                ButTemp = tk.Button(self, text=KeyName, width=4, command=GetValueLoc)
+                ButTemp.grid(row=RowNum , column=(i - si))
+                itot = itot + 1
+                
+            RowNum = RowNum + 1
+            
+        tk.Button(self, text="Cancel", width=10, command=self.cancel,font=self.BodyFont).grid(row=RowNum + 1, column=(i - si + 1) )
+            
+        
+            
+    def GetValue(self,Value):
+        self.SelKey = Value
+        self.ok()    
+  
+    #
+    # standard button semantics
+
+    def ok(self, event=None):
+        self.withdraw()
+        self.update_idletasks()
+        self.leave()
+            
+    def leave(self):
+        self.root.focus_set()
+        self.destroy()
+
+            
+    def cancel(self, event=None):
+        self.SelKey = self.CurKey
+        self.leave()
+        
+
+class SchoolNameSelector(tk.Toplevel):
+
+    def __init__(self, root,Competition,CurName,TitleFont, BodyFont, title = 'Select School By Name'):
+        
+        self.TitleFont = TitleFont
+        self.BodyFont = BodyFont 
+
+        tk.Toplevel.__init__(self, root)
+        self.transient(root)
+
+        if title:
+            self.title(title)
+
+        self.root = root
+        self.Competition = Competition
+        self.CurName = CurName
+        self.SelName = self.CurName
+        
+
+        body = tk.Frame(self)
+        self.initial_focus = self.body(body)
+        body.grid(row = 0, column = 0)
+
+        self.wait_visibility()
+        self.grab_set()
+
+        if not self.initial_focus:
+            self.initial_focus = self
+
+        self.protocol("WM_DELETE_WINDOW", self.cancel)
+
+        self.geometry("+%d+%d" % (root.winfo_rootx()+50,
+                                  root.winfo_rooty()+50))
+
+        self.initial_focus.focus_set()
+
+        self.wait_window(self)
+
+    #
+    # construction hooks
+
+    def body(self, master): 
+
+        self.Competition.SortListName()
+        
+        self.ListBox1 = tk.Listbox(self,width= 40,font=self.BodyFont)
+        self.ListBox1.grid(row = 1, column = 0)
+        self.ListBox1.bind('<Double-1>', self.SelectSchool)
+        
+        scrollbar = tk.Scrollbar(self, orient="vertical")
+        scrollbar.config(command=self.ListBox1.yview)
+        scrollbar.grid(row = 1, column = 1)
+        self.ListBox1.config(yscrollcommand=scrollbar.set)
+
+        i = 0
+        for School in self.Competition.SchoolList:
+            self.ListBox1.insert(i,School.Name)
+            i = i + 1        
+   
+       
+        tk.Button(self, text="Select", width=10, command=self.SelectSchool,font=self.BodyFont).grid(row=2, column=2 )
+        tk.Button(self, text="Cancel", width=10, command=self.cancel,font=self.BodyFont).grid(row=3, column=2 )
+        
+        self.Competition.SortList()
+            
+        
+            
+    def SelectSchool(self,event=None):
+        self.SelName = self.ListBox1.get('active') 
+        self.ok()    
+  
+    #
+    # standard button semantics
+
+    def ok(self, event=None):
+        self.withdraw()
+        self.update_idletasks()
+        self.leave()
+            
+    def leave(self):
+        self.root.focus_set()
+        self.destroy()
+
+            
+    def cancel(self, event=None):
+        self.SelName = self.CurName
+        self.leave()
 
         

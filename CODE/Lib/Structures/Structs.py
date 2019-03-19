@@ -1,6 +1,7 @@
 import csv
 import random
 import copy
+import string
 from ..Functions.Functions import NextKey     
 
 class PreviousSchool:
@@ -167,6 +168,13 @@ class RegisterSchoolList:
             if(School.Key == Key):
                 return School
         return None
+
+    def FindName(self,Name):
+        for School in self.SchoolList:
+            if(School.Name == Name):
+                return School
+        return None        
+        
     def KeyInList(self,Key):
          return len(filter(lambda School: School.Key == Key, self.SchoolList)) != 0
     def NameInList(self,Name):
@@ -204,6 +212,9 @@ class CompetitionSchoolList:
         self.ValidNames = [self.ValidGroupNames,self.ValidSwissNames, self.ValidCrossNames, self.ValidRelayNames]
         
         self.ValidSwissSites = []
+        
+        self.KeyLetterListCondensed = []
+        self.SwissSitesLetterCondensed = []
 
 
         self.Result = []
@@ -245,6 +256,11 @@ class CompetitionSchoolList:
     def SortList(self):
         #sort the school list by name
         self.SchoolList.sort(key=lambda School: 100*ord(School.Key[0]) + int(School.Key[1:]) )  
+
+    def SortListName(self):
+        #sort the school list by name
+        self.SchoolList.sort(key=lambda School: School.Name )  
+        
     def SortListScores(self):
         self.SchoolList.sort(key=lambda School: School.Total, reverse=True )  
         
@@ -287,7 +303,7 @@ class CompetitionSchoolList:
 
     def ReadFromFile(self):
         
-        #self.SchoolList = []
+        self.SchoolList = []
         
         with open(self.File,'r') as file1:
             readfile = csv.reader(file1, delimiter = ',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
@@ -324,17 +340,39 @@ class CompetitionSchoolList:
                 j = j + 1 
         self.SortList()
         self.PossibleSwissSites()
+        self.HowManyLettersInKeys()
+        self.HowManyLettersInSites()
         
     def FindKey(self,Key):
         for School in self.SchoolList:
             if(School.Key == Key):
                 return School
         return None
+        
+    def FindName(self,Name):
+        for School in self.SchoolList:
+            if(School.Name == Name):
+                return School
+        return None
+
+        
     def KeyInList(self,Key):
          return len(filter(lambda School: School.Key == Key, self.SchoolList)) != 0
          
     def NameInList(self,Name):
          return len(filter(lambda School: School.Name == Name, self.SchoolList)) != 0
+
+    def HowManyLettersInKeys(self):
+        self.KeyLetterListCondensed = []
+        for Letter in string.ascii_uppercase:
+            Count = 0
+            for School in self.SchoolList:
+                
+                if Letter in School.Key:
+                    Count = Count +1
+                    
+            if (Count > 0):
+                self.KeyLetterListCondensed.append((Letter,Count))
      
     def PrintList(self):
         for School in self.SchoolList:
@@ -345,7 +383,18 @@ class CompetitionSchoolList:
         self.ValidSwissSites = []
         for i in range(0,len(self.SchoolList),2):
             self.ValidSwissSites.append(self.SchoolList[i].Key)
-        
+    
+    def HowManyLettersInSites(self):
+        self.SwissSitesLetterCondensed = []
+        for Letter in string.ascii_uppercase:
+            Count = 0
+            for Site in self.ValidSwissSites:
+                
+                if Letter in Site:
+                    Count = Count +1
+                    
+            if (Count > 0):
+                self.SwissSitesLetterCondensed.append((Letter,Count))    
      
     def UpdateTotalsSchool(self,ContestString=['A']):
         

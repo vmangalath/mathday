@@ -4,7 +4,7 @@ import tkFileDialog
 import csv
 import tkMessageBox
 from functools import partial
-from .DialogueBoxes import SetupMenuRegisterSchool,SetupMenuNewSchool,SetupMenuModifyRegisterSchool,SetupMenuCompetitionName,SwissRoundNumberselector
+from .DialogueBoxes import SetupMenuRegisterSchool,SetupMenuNewSchool,SetupMenuModifyRegisterSchool,SetupMenuCompetitionName,SwissRoundNumberselector,SchoolKeySelector,SiteSelector,SchoolNameSelector
 from ..Structures.Structs import PreviousSchoolList,RegisterSchoolList,RegisteredSchool,PreviousSchool,CompetitionSchoolList
    
 class MainMenuBody:
@@ -378,7 +378,7 @@ class SwissContestBody:
             GenerateRoundBut = tk.Button(self.master, text="Generate Round", font=self.TitleFont, width=16, command=self.GenerateRound)
             GenerateRoundBut.grid(row = 1, column = 0)
             
-            BackBut = tk.Button(self.master, text="Back", font=self.TitleFont, width= 8, command=self.GotoCompMain)
+            BackBut = tk.Button(self.master, text="Back", font=self.TitleFont, width= 8, command=self.GotoCompMainGenScreen)
             BackBut.grid(row = 1, column = 1)
             
         else:
@@ -392,7 +392,9 @@ class SwissContestBody:
             tk.Label(F1, text=Str1,bd = 4, font=self.TitleFont).grid(row = 0, column = 0)
             
             Str1 = 'Round ' + str(self.RoundNum)
-            tk.Label(F1, text=Str1,bd = 4, font=self.TitleFont).grid(row = 1, column = 0)
+            RoundLab = tk.Label(F1, text=Str1,bd = 4, font=self.TitleFont)
+            RoundLab.grid(row = 1, column = 0)
+            RoundLab.bind('<Double-1>',self.ChooseRound)
             
             F0 = tk.Frame(self.master,height=10,width=10, bd=1)
             F0.grid(row = 1, column = 0)
@@ -409,28 +411,37 @@ class SwissContestBody:
             
             SiteLab =  tk.Label(F2f1f1, text=self.Site,width=4,bd = 4, font=self.TitleFont)
             SiteLab.grid(row = 0, column = 0)
+            SiteLab.bind('<Double-1>',self.ChooseSite)
             
             
             School1 = self.SwissPartners[0].Key
             School1Lab =  tk.Label(F2f1, text=School1,width=4,bd = 4, font=self.TitleFont)
             School1Lab.grid(row = 0, column = 1)
+            ChooseSchool1Key = partial(self.ChooseSchoolKey,School1)
+            School1Lab.bind('<Double-1>',ChooseSchool1Key)
             
             School1Name = self.SwissPartners[0].Name[:40]
             School1NameLab =  tk.Label(F2f1, text=School1Name,width=40,bd = 4, font=self.TitleFont)
             School1NameLab.grid(row = 0, column = 2)
+            ChooseSchool1Name = partial(self.ChooseSchoolName,self.SwissPartners[0].Name)
+            School1NameLab.bind('<Double-1>',ChooseSchool1Name)
             
             School1Score = self.SwissPartners[0].SwissScores[RoundNum-1]
             School1ScoreTKVal = tk.StringVar(self.master, value=str(School1Score))
             self.School1ScoreEntry =  tk.Entry(F2f1, textvariable=School1ScoreTKVal,width=4,bd = 4, font=self.TitleFont)
-            self.School1ScoreEntry .grid(row = 0, column = 3)
+            self.School1ScoreEntry.grid(row = 0, column = 3)
             
             School2 = self.SwissPartners[1].Key
             School2Lab =  tk.Label(F2f1, text=School2,bd = 4,width=4, font=self.TitleFont)
             School2Lab.grid(row = 1, column = 1)
+            ChooseSchool2Key = partial(self.ChooseSchoolKey,School2)
+            School2Lab.bind('<Double-1>',ChooseSchool2Key)
             
             School2Name = self.SwissPartners[1].Name[:40]
             School2NameLab =  tk.Label(F2f1, text=School2Name,width=40,bd = 4, font=self.TitleFont)
             School2NameLab.grid(row = 1, column = 2)
+            ChooseSchool2Name = partial(self.ChooseSchoolName,self.SwissPartners[1].Name)
+            School2NameLab.bind('<Double-1>',ChooseSchool2Name)
             
             School2Score = self.SwissPartners[1].SwissScores[RoundNum-1]
             School2ScoreTKVal = tk.StringVar(self.master, value=str(School2Score))
@@ -450,22 +461,94 @@ class SwissContestBody:
             F4 = tk.Frame(F0,height=10,width=10, bd=1)
             F4.grid(row = 2, column = 1)
             
+            OKBut = tk.Button(F4, text="Ok", font=self.TitleFont, width= 8, command=self.Validate)
+            OKBut.grid(row = 0, column = 0)
+            
             BackBut = tk.Button(F4, text="Back", font=self.TitleFont, width= 8, command=self.GotoCompMain)
-            BackBut.grid(row = 0, column = 0)
+            BackBut.grid(row = 1, column = 0)
         
-    
+    def Validate(self):
+        Valid = False
+        try:
+            School1Score = int(self.School1ScoreEntry.get())
+            
+            if (School1Score < 0 or School1Score > self.Competition.ValidSwissScores[self.RoundNum - 1]):
+                string1 = 'Entered Score for ' + self.SwissPartners[0].Name + ' Not Valid. \n Must be between 0 and ' + str(self.Competition.ValidSwissScores[self.RoundNum - 1]) 
+                tkMessageBox.showwarning("Error", string1)
+            else:
+                #Assign The Value
+                Valid = True
+                self.SwissPartners[0].SwissScores[self.RoundNum-1] = School1Score
+                
+        except Exception:
+            string1 = 'Entered Score for ' + self.SwissPartners[0].Name + ' Not A Number.'
+            tkMessageBox.showwarning("Error", string1)
+            #ZeroTKVal = tk.StringVar(self.master, value=str(0))
+            #self.School1ScoreEntry.set(ZeroTKVal)
+            
+        try:
+            School2Score = int(self.School2ScoreEntry.get())
+            
+            if (School2Score < 0 or School2Score  > self.Competition.ValidSwissScores[self.RoundNum - 1]):
+                string1 = 'Entered Score for ' + self.SwissPartners[1].Name + ' Not Valid. \n Must be between 0 and ' + str(self.Competition.ValidSwissScores[self.RoundNum - 1]) 
+                tkMessageBox.showwarning("Error", string1)
+                Valid = False
+            else:
+                self.SwissPartners[1].SwissScores[self.RoundNum-1] = School2Score
+                
+        except Exception:
+            Valid = False
+            string1 = 'Entered Score for ' + self.SwissPartners[1].Name + ' Not A Number.'
+            tkMessageBox.showwarning("Error", string1)
+            #ZeroTKVal = tk.StringVar(self.master, value=str(0))
+            #self.School1ScoreEntry.set(ZeroTKVal)
+            #Valid
+        return Valid
+        
+        
     
     def Print1(self):
         print('1')
+        
+    def ChooseSchoolName(self,Key,event=None):
+        
+        if (self.Validate()):
+            SchoolKeySelectorDialog = SchoolNameSelector(self.root,self.Competition,Key,self.TitleFont, self.BodyFont)
+            
+            #Find Site by School Key
+            SchoolFound = self.Competition.FindName(SchoolKeySelectorDialog.SelName)
+            self.Site = SchoolFound.SwissSites[self.RoundNum - 1]
+            self.ReloadScreen()
+        
+    def ChooseSchoolKey(self,Key,event=None):
+        
+        if (self.Validate()):
+            SchoolKeySelectorDialog = SchoolKeySelector(self.root,self.Competition,Key,self.TitleFont, self.BodyFont)
+            
+            #Find Site by School Key
+            SchoolFound = self.Competition.FindKey(SchoolKeySelectorDialog.SelKey)
+            self.Site = SchoolFound.SwissSites[self.RoundNum - 1]
+            self.ReloadScreen()
+        
+    def ChooseSite(self,Key,event=None):
+        
+        if (self.Validate()):
+            
+            SiteSelectorDialog = SiteSelector(self.root,self.Competition,self.Site,self.TitleFont, self.BodyFont)
+            
+            self.Site = SiteSelectorDialog.SelKey
+            self.ReloadScreen()
         
     def ReloadScreen(self):
         self.ClearBody()
         SwissContestBody(self.master,self.root,self.TitleFont,self.MedTitleFont,self.BodyFont,self.Competition,self.RoundNum,self.Site)
     
-    def ChooseRound(self):
-        RoundSelectDialog = SwissRoundNumberselector(self.root,self.Competition,self.RoundNum,self.TitleFont, self.BodyFont)
-        self.RoundNum = RoundSelectDialog.SelRoundNum
-        self.ReloadScreen()
+    def ChooseRound(self,event=None):
+        if (self.Validate()):
+            self.Competition.WriteToFile()
+            RoundSelectDialog = SwissRoundNumberselector(self.root,self.Competition,self.RoundNum,self.TitleFont, self.BodyFont)
+            self.RoundNum = RoundSelectDialog.SelRoundNum
+            self.ReloadScreen()
     
     def GenerateRound(self):
         self.Competition.GenerateSwissPartners(self.RoundNum)
@@ -477,10 +560,15 @@ class SwissContestBody:
             widget.destroy()
         
     def GotoCompMain(self):
-        self.ClearBody()
         
-        CompMainMenuBody(self.master,self.root, self.TitleFont, self.MedTitleFont, self.BodyFont,self.Competition)
+        if (self.Validate()):
+            self.ClearBody()
+            
+            CompMainMenuBody(self.master,self.root, self.TitleFont, self.MedTitleFont, self.BodyFont,self.Competition)
 
+    def GotoCompMainGenScreen(self):
+        self.ClearBody()
+        CompMainMenuBody(self.master,self.root, self.TitleFont, self.MedTitleFont, self.BodyFont,self.Competition)
         
 def LoadMainMenu(root,LargeTitleFont,MedTitleFont,BodyFont):
     root.title("MathDay ScoreKeeper")

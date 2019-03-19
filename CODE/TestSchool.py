@@ -1,4 +1,4 @@
-"""
+
 from Lib.Structures.Structs import CompetitionSchool,PreviousSchool,RegisteredSchool,RegisterSchoolList, PreviousSchoolList,CompetitionSchoolList
 
 MasterFileSchool = './Data/Master/Schools.csv'
@@ -22,9 +22,9 @@ Comp1.SchoolList[0].SwissSites[0] = 'A1'
 Comp1.WriteToFile()
 
 Comp1.ReadFromFile()
+
+
 """
-
-
 from Lib.Structures.Structs import SwissPair,ListOfSwissPairs
 
 a1 = SwissPair('A1','A2','A3')
@@ -32,5 +32,6 @@ a2 = SwissPair('A3','A1','A4')
 a3 = SwissPair('A99','A5','A6')
 
 All = ListOfSwissPairs(SwissPairs=[a1,a2,a3])
+"""
 
 
