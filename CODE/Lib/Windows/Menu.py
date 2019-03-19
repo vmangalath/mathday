@@ -331,17 +331,23 @@ class CompMainMenuBody:
         f1.grid(row = 5, column = 0)
         
     def GotoGroupMenu(self):
-        print('Group')
+        self.ClearBody()
+        GroupContestBody(self.master,self.root,self.TitleFont,self.MedTitleFont,self.BodyFont,self.Competition,self.Competition.SchoolList[0].Key)
+
     
     def GotoSwissMenu(self):
         self.ClearBody()
-        SwissContestBody(self.master,self.root,self.TitleFont,self.MedTitleFont,self.BodyFont,self.Competition,1,'A1')
+        SwissContestBody(self.master,self.root,self.TitleFont,self.MedTitleFont,self.BodyFont,self.Competition,1,self.Competition.ValidSwissSites[0])
         
     def GotoCrossMenu(self):
-        print('Cross')
+        self.ClearBody()
+        CrossContestBody(self.master,self.root,self.TitleFont,self.MedTitleFont,self.BodyFont,self.Competition,self.Competition.SchoolList[0].Key)
+
         
     def GotoRelayMenu(self):
-        print('Relay')
+        self.ClearBody()
+        RelayContestBody(self.master,self.root,self.TitleFont,self.MedTitleFont,self.BodyFont,self.Competition,self.Competition.SchoolList[0].Key)
+
         
     def ClearBody(self):
         for widget in self.master.winfo_children():
@@ -350,7 +356,137 @@ class CompMainMenuBody:
     def GotoMainMenu(self):
         self.ClearBody()
         MainMenuBody(self.master,self.root,self.TitleFont,self.MedTitleFont, self.BodyFont,self.Competition.DataDir)
+
+
+#Group Competition
+class GroupContestBody:
+    def __init__(self, master,root, TitleFont, MedTitleFont, BodyFont,Competition,SchoolKey):
         
+        self.TitleFont = TitleFont
+        self.BodyFont = BodyFont
+        self.MedTitleFont = MedTitleFont
+        
+        self.Competition = Competition
+        
+        self.master = master
+        self.root = root
+        
+        self.SchoolKey = SchoolKey
+        self.School = self.Competition.FindKey(self.SchoolKey)
+                
+        
+        F0 = tk.Frame(self.master,height=10,width=10, bd=1)
+        F0.grid(row = 0, column = 0)
+        
+        #CCompetition Name
+        Str1 = 'Group Contest'
+        tk.Label(F0, text=Str1,bd = 4, font=self.TitleFont).grid(row = 0, column = 0)
+        
+        F1 = tk.Frame(self.master,height=10,width=10, bd=1)
+        F1.grid(row = 1, column = 0)
+        
+        F1f1 = tk.Frame(F1,height=10,width=10, bd=1)
+        F1f1.grid(row = 0, column = 0)
+        
+        School1 = self.School.Key
+        School1Lab =  tk.Label(F1f1, text=School1,width=4,bd = 4, font=self.TitleFont)
+        School1Lab.grid(row = 0, column = 0)
+        School1Lab.bind('<Double-1>',self.ChooseSchoolKey)
+        
+        School1Name = self.School.Name[:40]
+        School1NameLab =  tk.Label(F1f1, text=School1Name,width=40,bd = 4, font=self.TitleFont)
+        School1NameLab.grid(row = 0, column = 1)
+        School1NameLab.bind('<Double-1>',self.ChooseSchoolName)
+        
+        F1f2 = tk.Frame(F1,height=10,width=10, bd=1)
+        F1f2.grid(row = 1, column = 0)
+        
+        #Put In Questions And Labels
+        GroupNum = 4
+        self.Entries = []
+        for i in range(len(self.Competition.ValidGroupNames)):
+            QString = 'Q' + str(self.Competition.ValidGroupNames[i])
+            tk.Label(F1f2, text=QString,width=6,bd = 4, font=self.TitleFont).grid(row=2*(i/GroupNum),column=i%GroupNum)
+            
+            TempEntryVal = tk.StringVar(value=str(self.School.GroupScores[i]))
+            self.Entries.append(tk.Entry(F1f2, textvariable=TempEntryVal,width=4,bd = 4, font=self.TitleFont))
+            self.Entries[i].grid(row=2*(i/GroupNum) + 1,column=i%GroupNum)
+        
+        
+        F2 = tk.Frame(self.master,height=10,width=10, bd=1)
+        F2.grid(row = 2, column = 0)
+        
+        tk.Button(F2, text="Select School Key", font=self.BodyFont, width= 20, command=self.ChooseSchoolKey).grid(row = 0, column = 0)
+        tk.Button(F2, text="Select School Name", font=self.BodyFont, width= 20, command=self.ChooseSchoolName).grid(row = 0, column = 1)
+        
+        BackBut = tk.Button(F2, text="Back", font=self.TitleFont, width= 8, command=self.GotoCompMain)
+        BackBut.grid(row = 1, column = 2)
+        
+        
+    def Validate(self):
+        Valids = []
+        
+        for i in range(len(self.Competition.ValidGroupScores)):
+         
+            try:
+                TempScore = int(self.Entries[i].get())
+                
+                if (TempScore < 0 or TempScore > self.Competition.ValidGroupScores[i]):
+                    string1 = 'Entered Score for Q' + str(self.Competition.ValidGroupNames[i]) + ' Not Valid. \n Must be between 0 and ' + str(self.Competition.ValidGroupScores[i]) 
+                    tkMessageBox.showwarning("Error", string1)
+                    Valids.append(False)
+                else:
+                    Valids.append(True)
+                    self.School.GroupScores[i] = TempScore 
+                    
+            except Exception:
+                string1 = 'Entered Score for Q' + str(self.Competition.ValidGroupNames[i]) + ' Not A Number.'
+                tkMessageBox.showwarning("Error", string1)
+                Valids.append(False)
+        
+        if False in Valids:
+            return False
+        else:
+            self.Competition.WriteToFile()
+            return True
+
+
+    def ChooseSchoolName(self,event=None):
+        
+        if (self.Validate()):
+            SchoolKeySelectorDialog = SchoolNameSelector(self.root,self.Competition,self.School.Name,self.TitleFont, self.BodyFont)
+            
+            #Find Site by School Key
+            SchoolFound = self.Competition.FindName(SchoolKeySelectorDialog.SelName)
+            self.SchoolKey = SchoolFound.Key
+            self.ReloadScreen()
+        
+    def ChooseSchoolKey(self,event=None):
+        
+        if (self.Validate()):
+            SchoolKeySelectorDialog = SchoolKeySelector(self.root,self.Competition,self.School.Key,self.TitleFont, self.BodyFont)
+            
+            #Find Site by School Key
+            self.SchoolKey = SchoolKeySelectorDialog.SelKey
+            self.ReloadScreen()
+        
+    def ReloadScreen(self):
+        self.ClearBody()
+        GroupContestBody(self.master,self.root,self.TitleFont,self.MedTitleFont,self.BodyFont,self.Competition,self.SchoolKey)   
+        
+    def ClearBody(self):
+        for widget in self.master.winfo_children():
+            widget.destroy()
+        
+    def GotoCompMain(self):
+        
+        if (self.Validate()):
+            self.ClearBody()
+            
+            CompMainMenuBody(self.master,self.root, self.TitleFont, self.MedTitleFont, self.BodyFont,self.Competition)
+
+
+#SWISS Competition        
 class SwissContestBody:
     def __init__(self, master,root, TitleFont, MedTitleFont, BodyFont,Competition,RoundNum,Site):
         
@@ -446,7 +582,7 @@ class SwissContestBody:
             School2Score = self.SwissPartners[1].SwissScores[RoundNum-1]
             School2ScoreTKVal = tk.StringVar(self.master, value=str(School2Score))
             self.School2ScoreEntry =  tk.Entry(F2f1, textvariable=School2ScoreTKVal,width=4,bd = 4, font=self.TitleFont)
-            self.School2ScoreEntry .grid(row = 1, column = 3)
+            self.School2ScoreEntry.grid(row = 1, column = 3)
     
     
             F3 = tk.Frame(F0,height=10,width=10, bd=1)
@@ -461,11 +597,23 @@ class SwissContestBody:
             F4 = tk.Frame(F0,height=10,width=10, bd=1)
             F4.grid(row = 2, column = 1)
             
-            OKBut = tk.Button(F4, text="Ok", font=self.TitleFont, width= 8, command=self.Validate)
-            OKBut.grid(row = 0, column = 0)
+            #OKBut = tk.Button(F4, text="Ok", font=self.TitleFont, width= 8, command=self.Validate)
+            #OKBut.grid(row = 0, column = 0)
             
             BackBut = tk.Button(F4, text="Back", font=self.TitleFont, width= 8, command=self.GotoCompMain)
             BackBut.grid(row = 1, column = 0)
+            
+            F5 = tk.Frame(self.master,height=10,width=10, bd=1)
+            F5.grid(row = 2, column = 0)
+            
+            
+            ChooseSchool1Key = partial(self.ChooseSchoolKey,School1)
+            ChooseSchool1Name = partial(self.ChooseSchoolName,self.SwissPartners[0].Name)
+            
+            tk.Button(F5, text="Select Site", font=self.BodyFont, width= 12, command=self.ChooseSite).grid(row = 0, column = 0)
+            tk.Button(F5, text="Select School Key", font=self.BodyFont, width= 20, command=ChooseSchool1Key).grid(row = 0, column = 1)
+            tk.Button(F5, text="Select School Name", font=self.BodyFont, width= 20, command=ChooseSchool1Name).grid(row = 0, column = 2)
+            
         
     def Validate(self):
         Valid = False
@@ -503,13 +651,10 @@ class SwissContestBody:
             #ZeroTKVal = tk.StringVar(self.master, value=str(0))
             #self.School1ScoreEntry.set(ZeroTKVal)
             #Valid
+        if (Valid):
+            self.Competition.WriteToFile()
         return Valid
-        
-        
-    
-    def Print1(self):
-        print('1')
-        
+
     def ChooseSchoolName(self,Key,event=None):
         
         if (self.Validate()):
@@ -530,7 +675,7 @@ class SwissContestBody:
             self.Site = SchoolFound.SwissSites[self.RoundNum - 1]
             self.ReloadScreen()
         
-    def ChooseSite(self,Key,event=None):
+    def ChooseSite(self,event=None):
         
         if (self.Validate()):
             
@@ -545,7 +690,6 @@ class SwissContestBody:
     
     def ChooseRound(self,event=None):
         if (self.Validate()):
-            self.Competition.WriteToFile()
             RoundSelectDialog = SwissRoundNumberselector(self.root,self.Competition,self.RoundNum,self.TitleFont, self.BodyFont)
             self.RoundNum = RoundSelectDialog.SelRoundNum
             self.ReloadScreen()
@@ -569,7 +713,263 @@ class SwissContestBody:
     def GotoCompMainGenScreen(self):
         self.ClearBody()
         CompMainMenuBody(self.master,self.root, self.TitleFont, self.MedTitleFont, self.BodyFont,self.Competition)
+ 
+
+class CrossContestBody:
+    def __init__(self, master,root, TitleFont, MedTitleFont, BodyFont,Competition,SchoolKey):
         
+        self.TitleFont = TitleFont
+        self.BodyFont = BodyFont
+        self.MedTitleFont = MedTitleFont
+        
+        self.Competition = Competition
+        
+        self.master = master
+        self.root = root
+        
+        self.SchoolKey = SchoolKey
+        self.School = self.Competition.FindKey(self.SchoolKey)
+                
+        
+        F0 = tk.Frame(self.master,height=10,width=10, bd=1)
+        F0.grid(row = 0, column = 0)
+        
+        #CCompetition Name
+        Str1 = 'Cross Contest'
+        tk.Label(F0, text=Str1,bd = 4, font=self.TitleFont).grid(row = 0, column = 0)
+        
+        F1 = tk.Frame(self.master,height=10,width=10, bd=1)
+        F1.grid(row = 1, column = 0)
+        
+        F1f1 = tk.Frame(F1,height=10,width=10, bd=1)
+        F1f1.grid(row = 0, column = 0)
+        
+        School1 = self.School.Key
+        School1Lab =  tk.Label(F1f1, text=School1,width=4,bd = 4, font=self.TitleFont)
+        School1Lab.grid(row = 0, column = 0)
+        School1Lab.bind('<Double-1>',self.ChooseSchoolKey)
+        
+        School1Name = self.School.Name[:40]
+        School1NameLab =  tk.Label(F1f1, text=School1Name,width=40,bd = 4, font=self.TitleFont)
+        School1NameLab.grid(row = 0, column = 1)
+        School1NameLab.bind('<Double-1>',self.ChooseSchoolName)
+        
+        F1f2 = tk.Frame(F1,height=10,width=10, bd=1)
+        F1f2.grid(row = 1, column = 0)
+        
+        #Put In Questions And Labels
+        self.Entries = []
+        GroupNum = 4
+        for i in range(len(self.Competition.ValidCrossNames)):
+            QString = 'Q' + str(self.Competition.ValidCrossNames[i])
+            tk.Label(F1f2, text=QString,width=6,bd = 4, font=self.TitleFont).grid(row=2*(i/GroupNum),column=i%GroupNum)
+            
+            TempEntryVal = tk.StringVar(value=str(self.School.CrossScores[i]))
+            self.Entries.append(tk.Entry(F1f2, textvariable=TempEntryVal,width=4,bd = 4, font=self.TitleFont))
+            self.Entries[i].grid(row=2*(i/GroupNum) + 1,column=i%GroupNum)
+        
+        
+        F2 = tk.Frame(self.master,height=10,width=10, bd=1)
+        F2.grid(row = 2, column = 0)
+        
+        tk.Button(F2, text="Select School Key", font=self.BodyFont, width= 20, command=self.ChooseSchoolKey).grid(row = 0, column = 0)
+        tk.Button(F2, text="Select School Name", font=self.BodyFont, width= 20, command=self.ChooseSchoolName).grid(row = 0, column = 1)
+        
+        BackBut = tk.Button(F2, text="Back", font=self.TitleFont, width= 8, command=self.GotoCompMain)
+        BackBut.grid(row = 1, column = 2)
+        
+        
+    def Validate(self):
+        Valids = []
+        
+        for i in range(len(self.Competition.ValidCrossScores)):
+         
+            try:
+                TempScore = int(self.Entries[i].get())
+                
+                if (TempScore < 0 or TempScore > self.Competition.ValidCrossScores[i]):
+                    string1 = 'Entered Score for Q' + str(self.Competition.ValidCrossNames[i]) + ' Not Valid. \n Must be between 0 and ' + str(self.Competition.ValidCrossScores[i]) 
+                    tkMessageBox.showwarning("Error", string1)
+                    Valids.append(False)
+                else:
+                    Valids.append(True)
+                    self.School.CrossScores[i] = TempScore 
+                    
+            except Exception:
+                string1 = 'Entered Score for Q' + str(self.Competition.ValidCrossNames[i]) + ' Not A Number.'
+                tkMessageBox.showwarning("Error", string1)
+                Valids.append(False)
+        
+        if False in Valids:
+            return False
+        else:
+            self.Competition.WriteToFile()
+            return True
+
+
+    def ChooseSchoolName(self,event=None):
+        
+        if (self.Validate()):
+            SchoolKeySelectorDialog = SchoolNameSelector(self.root,self.Competition,self.School.Name,self.TitleFont, self.BodyFont)
+            
+            #Find Site by School Key
+            SchoolFound = self.Competition.FindName(SchoolKeySelectorDialog.SelName)
+            self.SchoolKey = SchoolFound.Key
+            self.ReloadScreen()
+        
+    def ChooseSchoolKey(self,event=None):
+        
+        if (self.Validate()):
+            SchoolKeySelectorDialog = SchoolKeySelector(self.root,self.Competition,self.School.Key,self.TitleFont, self.BodyFont)
+            
+            #Find Site by School Key
+            self.SchoolKey = SchoolKeySelectorDialog.SelKey
+            self.ReloadScreen()
+        
+    def ReloadScreen(self):
+        self.ClearBody()
+        CrossContestBody(self.master,self.root,self.TitleFont,self.MedTitleFont,self.BodyFont,self.Competition,self.SchoolKey)   
+        
+    def ClearBody(self):
+        for widget in self.master.winfo_children():
+            widget.destroy()
+        
+    def GotoCompMain(self):
+        
+        if (self.Validate()):
+            self.ClearBody()
+            
+            CompMainMenuBody(self.master,self.root, self.TitleFont, self.MedTitleFont, self.BodyFont,self.Competition)
+
+
+
+class RelayContestBody:
+    def __init__(self, master,root, TitleFont, MedTitleFont, BodyFont,Competition,SchoolKey):
+        
+        self.TitleFont = TitleFont
+        self.BodyFont = BodyFont
+        self.MedTitleFont = MedTitleFont
+        
+        self.Competition = Competition
+        
+        self.master = master
+        self.root = root
+        
+        self.SchoolKey = SchoolKey
+        self.School = self.Competition.FindKey(self.SchoolKey)
+                
+        
+        F0 = tk.Frame(self.master,height=10,width=10, bd=1)
+        F0.grid(row = 0, column = 0)
+        
+        #CCompetition Name
+        Str1 = 'Relay Contest'
+        tk.Label(F0, text=Str1,bd = 4, font=self.TitleFont).grid(row = 0, column = 0)
+        
+        F1 = tk.Frame(self.master,height=10,width=10, bd=1)
+        F1.grid(row = 1, column = 0)
+        
+        F1f1 = tk.Frame(F1,height=10,width=10, bd=1)
+        F1f1.grid(row = 0, column = 0)
+        
+        School1 = self.School.Key
+        School1Lab =  tk.Label(F1f1, text=School1,width=4,bd = 4, font=self.TitleFont)
+        School1Lab.grid(row = 0, column = 0)
+        School1Lab.bind('<Double-1>',self.ChooseSchoolKey)
+        
+        School1Name = self.School.Name[:40]
+        School1NameLab =  tk.Label(F1f1, text=School1Name,width=40,bd = 4, font=self.TitleFont)
+        School1NameLab.grid(row = 0, column = 1)
+        School1NameLab.bind('<Double-1>',self.ChooseSchoolName)
+        
+        F1f2 = tk.Frame(F1,height=10,width=10, bd=1)
+        F1f2.grid(row = 1, column = 0)
+        
+        #Put In Questions And Labels
+        GroupNum = 5
+        self.Entries = []
+        for i in range(len(self.Competition.ValidRelayNames)):
+            QString = 'Q' + str(self.Competition.ValidRelayNames[i])
+            tk.Label(F1f2, text=QString,width=6,bd = 4, font=self.TitleFont).grid(row=2*(i/GroupNum),column=i%GroupNum)
+            
+            TempEntryVal = tk.StringVar(value=str(self.School.RelayScores[i]))
+            self.Entries.append(tk.Entry(F1f2, textvariable=TempEntryVal,width=4,bd = 4, font=self.TitleFont))
+            self.Entries[i].grid(row=2*(i/GroupNum) + 1,column=i%GroupNum)
+        
+        
+        F2 = tk.Frame(self.master,height=10,width=10, bd=1)
+        F2.grid(row = 2, column = 0)
+        
+        tk.Button(F2, text="Select School Key", font=self.BodyFont, width= 20, command=self.ChooseSchoolKey).grid(row = 0, column = 0)
+        tk.Button(F2, text="Select School Name", font=self.BodyFont, width= 20, command=self.ChooseSchoolName).grid(row = 0, column = 1)
+        
+        BackBut = tk.Button(F2, text="Back", font=self.TitleFont, width= 8, command=self.GotoCompMain)
+        BackBut.grid(row = 1, column = 2)
+        
+        
+    def Validate(self):
+        Valids = []
+        
+        for i in range(len(self.Competition.ValidRelayScores)):
+         
+            try:
+                TempScore = int(self.Entries[i].get())
+                
+                if (TempScore < 0 or TempScore > self.Competition.ValidRelayScores[i]):
+                    string1 = 'Entered Score for Q' + str(self.Competition.ValidRelayNames[i]) + ' Not Valid. \n Must be between 0 and ' + str(self.Competition.ValidCrossScores[i]) 
+                    tkMessageBox.showwarning("Error", string1)
+                    Valids.append(False)
+                else:
+                    Valids.append(True)
+                    self.School.RelayScores[i] = TempScore 
+                    
+            except Exception:
+                string1 = 'Entered Score for Q' + str(self.Competition.ValidRelayNames[i]) + ' Not A Number.'
+                tkMessageBox.showwarning("Error", string1)
+                Valids.append(False)
+        
+        if False in Valids:
+            return False
+        else:
+            self.Competition.WriteToFile()
+            return True
+
+
+    def ChooseSchoolName(self,event=None):
+        
+        if (self.Validate()):
+            SchoolKeySelectorDialog = SchoolNameSelector(self.root,self.Competition,self.School.Name,self.TitleFont, self.BodyFont)
+            
+            #Find Site by School Key
+            SchoolFound = self.Competition.FindName(SchoolKeySelectorDialog.SelName)
+            self.SchoolKey = SchoolFound.Key
+            self.ReloadScreen()
+        
+    def ChooseSchoolKey(self,event=None):
+        
+        if (self.Validate()):
+            SchoolKeySelectorDialog = SchoolKeySelector(self.root,self.Competition,self.School.Key,self.TitleFont, self.BodyFont)
+            
+            #Find Site by School Key
+            self.SchoolKey = SchoolKeySelectorDialog.SelKey
+            self.ReloadScreen()
+        
+    def ReloadScreen(self):
+        self.ClearBody()
+        RelayContestBody(self.master,self.root,self.TitleFont,self.MedTitleFont,self.BodyFont,self.Competition,self.SchoolKey)   
+        
+    def ClearBody(self):
+        for widget in self.master.winfo_children():
+            widget.destroy()
+        
+    def GotoCompMain(self):
+        
+        if (self.Validate()):
+            self.ClearBody()
+            
+            CompMainMenuBody(self.master,self.root, self.TitleFont, self.MedTitleFont, self.BodyFont,self.Competition)
+
+       
 def LoadMainMenu(root,LargeTitleFont,MedTitleFont,BodyFont):
     root.title("MathDay ScoreKeeper")
     BodyFrame  = tk.Frame(root)
