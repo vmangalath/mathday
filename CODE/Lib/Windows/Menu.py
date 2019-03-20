@@ -404,6 +404,8 @@ class GroupContestBody:
         #Put In Questions And Labels
         GroupNum = 4
         self.Entries = []
+        
+                
         for i in range(len(self.Competition.ValidGroupNames)):
             QString = 'Q' + str(self.Competition.ValidGroupNames[i])
             tk.Label(F1f2, text=QString,width=6,bd = 4, font=self.TitleFont).grid(row=2*(i/GroupNum),column=i%GroupNum)
@@ -411,6 +413,17 @@ class GroupContestBody:
             TempEntryVal = tk.StringVar(value=str(self.School.GroupScores[i]))
             self.Entries.append(tk.Entry(F1f2, textvariable=TempEntryVal,width=4,bd = 4, font=self.TitleFont))
             self.Entries[i].grid(row=2*(i/GroupNum) + 1,column=i%GroupNum)
+            
+            EntryClearTest = partial(self.ClearText, i)
+            self.Entries[i].bind('<FocusIn>', EntryClearTest)
+            
+            ValidateOnLeave = partial(self.ValidateFocusLeft, i)
+            self.Entries[i].bind('<FocusOut>', ValidateOnLeave)
+        
+        #All widgets need to be created for next to work
+        for i in range(len(self.Entries)):
+            EntryNext = partial(self.NextEntry, i,len(self.Entries))
+            self.Entries[i].bind('<Return>', EntryNext)
         
         
         F2 = tk.Frame(self.master,height=10,width=10, bd=1)
@@ -421,12 +434,69 @@ class GroupContestBody:
         
         BackBut = tk.Button(F2, text="Back", font=self.TitleFont, width= 8, command=self.GotoCompMain)
         BackBut.grid(row = 1, column = 2)
+
+    def ValidateFocusLeft(self,i,event=None):
+        if( not self.ValidateInd(i)):
+            self.Entries[i].focus()
+
         
+    def NextEntry(self,i,n,event=None):
+        if (i < n -1):
+            
+            if(self.ValidateInd(i)):
+                self.Entries[i+1].focus()
+            else:
+                self.InvalidResponse(i)
+        else:
+            
+            if(self.ValidateInd(i)):
+                #Current School Index =
+                Curi = self.Competition.SchoolList.index(self.School)
+                
+                self.Competition.WriteToFile()
+                self.SchoolKey = self.Competition.SchoolList[ (Curi + 1) % len(self.Competition.SchoolList)].Key
+                
+                self.ReloadScreen()
+                
+            else:
+                self.InvalidResponse(i)
+
+    def ClearText(self,i,event=None):
+        self.Entries[i].delete(0, "end")
+    
+    def InvalidResponse(self,i):
+        self.ClearText(i)
+        self.Entries[i].focus()
+
+    def ValidateInd(self,i,Event=None):
         
+        if (self.Entries[i].get() == ''):
+            self.Entries[i].insert(0, str(self.School.GroupScores[i]))
+        
+        try:
+            TempScore = int(self.Entries[i].get())
+            
+            if (TempScore < 0 or TempScore > self.Competition.ValidGroupScores[i]):
+                    string1 = 'Entered Score for Q' + str(self.Competition.ValidGroupNames[i]) + ' Not Valid. \n Must be between 0 and ' + str(self.Competition.ValidGroupScores[i]) 
+                    tkMessageBox.showwarning("Error", string1)
+                    return False
+            else:
+                self.School.GroupScores[i] = TempScore 
+                return True
+        
+        except Exception:
+                string1 = 'Entered Score for Q' + str(self.Competition.ValidGroupNames[i]) + ' Not A Number.'
+                tkMessageBox.showwarning("Error", string1)
+                
+                return False
+
     def Validate(self):
         Valids = []
         
         for i in range(len(self.Competition.ValidGroupScores)):
+            
+            if (self.Entries[i].get() == ''):
+                self.Entries[i].insert(0, str(self.School.GroupScores[i]))
          
             try:
                 TempScore = int(self.Entries[i].get())
@@ -484,6 +554,7 @@ class GroupContestBody:
             self.ClearBody()
             
             CompMainMenuBody(self.master,self.root, self.TitleFont, self.MedTitleFont, self.BodyFont,self.Competition)
+
 
 
 #SWISS Competition        
@@ -549,40 +620,41 @@ class SwissContestBody:
             SiteLab.grid(row = 0, column = 0)
             SiteLab.bind('<Double-1>',self.ChooseSite)
             
+            i = 0
+            self.Entries = []
+            for i in range( len(self.SwissPartners)  ):
+                School= self.SwissPartners[i].Key
+                SchoolLab =  tk.Label(F2f1, text=School,width=4,bd = 4, font=self.TitleFont)
+                SchoolLab.grid(row = i, column = 1)
+                ChooseSchoolKey = partial(self.ChooseSchoolKey,School)
+                SchoolLab.bind('<Double-1>',ChooseSchoolKey)
+                
+                SchoolName = self.SwissPartners[i].Name[:40]
+                SchoolNameLab =  tk.Label(F2f1, text=SchoolName,width=40,bd = 4, font=self.TitleFont)
+                SchoolNameLab.grid(row = i, column = 2)
+                ChooseSchoolName = partial(self.ChooseSchoolName,self.SwissPartners[i].Name)
+                SchoolNameLab.bind('<Double-1>',ChooseSchoolName)
+                
+                
+                SchoolScore = self.SwissPartners[i].SwissScores[RoundNum-1]
+                SchoolScoreTKVal = tk.StringVar(self.master, value=str(SchoolScore))
+                self.Entries.append(tk.Entry(F2f1, textvariable=SchoolScoreTKVal,width=4,bd = 4, font=self.TitleFont))
+                self.Entries[i].grid(row = i, column = 3)
+                
+                EntryClearTest = partial(self.ClearText, i)
+                self.Entries[i].bind('<FocusIn>', EntryClearTest)
+                
+                ValidateOnLeave = partial(self.ValidateFocusLeft, i)
+                self.Entries[i].bind('<FocusOut>', ValidateOnLeave)
             
-            School1 = self.SwissPartners[0].Key
-            School1Lab =  tk.Label(F2f1, text=School1,width=4,bd = 4, font=self.TitleFont)
-            School1Lab.grid(row = 0, column = 1)
-            ChooseSchool1Key = partial(self.ChooseSchoolKey,School1)
-            School1Lab.bind('<Double-1>',ChooseSchool1Key)
+        
             
-            School1Name = self.SwissPartners[0].Name[:40]
-            School1NameLab =  tk.Label(F2f1, text=School1Name,width=40,bd = 4, font=self.TitleFont)
-            School1NameLab.grid(row = 0, column = 2)
-            ChooseSchool1Name = partial(self.ChooseSchoolName,self.SwissPartners[0].Name)
-            School1NameLab.bind('<Double-1>',ChooseSchool1Name)
             
-            School1Score = self.SwissPartners[0].SwissScores[RoundNum-1]
-            School1ScoreTKVal = tk.StringVar(self.master, value=str(School1Score))
-            self.School1ScoreEntry =  tk.Entry(F2f1, textvariable=School1ScoreTKVal,width=4,bd = 4, font=self.TitleFont)
-            self.School1ScoreEntry.grid(row = 0, column = 3)
-            
-            School2 = self.SwissPartners[1].Key
-            School2Lab =  tk.Label(F2f1, text=School2,bd = 4,width=4, font=self.TitleFont)
-            School2Lab.grid(row = 1, column = 1)
-            ChooseSchool2Key = partial(self.ChooseSchoolKey,School2)
-            School2Lab.bind('<Double-1>',ChooseSchool2Key)
-            
-            School2Name = self.SwissPartners[1].Name[:40]
-            School2NameLab =  tk.Label(F2f1, text=School2Name,width=40,bd = 4, font=self.TitleFont)
-            School2NameLab.grid(row = 1, column = 2)
-            ChooseSchool2Name = partial(self.ChooseSchoolName,self.SwissPartners[1].Name)
-            School2NameLab.bind('<Double-1>',ChooseSchool2Name)
-            
-            School2Score = self.SwissPartners[1].SwissScores[RoundNum-1]
-            School2ScoreTKVal = tk.StringVar(self.master, value=str(School2Score))
-            self.School2ScoreEntry =  tk.Entry(F2f1, textvariable=School2ScoreTKVal,width=4,bd = 4, font=self.TitleFont)
-            self.School2ScoreEntry.grid(row = 1, column = 3)
+        
+            #All widgets need to be created for next to work
+            for i in range(len(self.Entries)):
+                EntryNext = partial(self.NextEntry, i,len(self.Entries))
+                self.Entries[i].bind('<Return>', EntryNext)
     
     
             F3 = tk.Frame(F0,height=10,width=10, bd=1)
@@ -607,53 +679,101 @@ class SwissContestBody:
             F5.grid(row = 2, column = 0)
             
             
-            ChooseSchool1Key = partial(self.ChooseSchoolKey,School1)
-            ChooseSchool1Name = partial(self.ChooseSchoolName,self.SwissPartners[0].Name)
-            
             tk.Button(F5, text="Select Site", font=self.BodyFont, width= 12, command=self.ChooseSite).grid(row = 0, column = 0)
-            tk.Button(F5, text="Select School Key", font=self.BodyFont, width= 20, command=ChooseSchool1Key).grid(row = 0, column = 1)
-            tk.Button(F5, text="Select School Name", font=self.BodyFont, width= 20, command=ChooseSchool1Name).grid(row = 0, column = 2)
+            tk.Button(F5, text="Select School Key", font=self.BodyFont, width= 20, command=ChooseSchoolKey).grid(row = 0, column = 1)
+            tk.Button(F5, text="Select School Name", font=self.BodyFont, width= 20, command=ChooseSchoolName).grid(row = 0, column = 2)
+
+
+    def ValidateFocusLeft(self,i,event=None):
+        if( not self.ValidateInd(i)):
+            self.Entries[i].focus()
+
+        
+    def NextEntry(self,i,n,event=None):
+        if (i < n -1):
             
+            if(self.ValidateInd(i)):
+                self.Entries[i+1].focus()
+            else:
+                self.InvalidResponse(i)
+        else:
+            
+            if(self.ValidateInd(i)):
+                #Current School Index =
+                Curi = self.Competition.ValidSwissSites.index(self.Site)
+                
+                self.Competition.WriteToFile()
+                self.Site = self.Competition.ValidSwissSites[ (Curi + 1) % len(self.Competition.ValidSwissSites)]
+                
+                self.ReloadScreen()
+                
+            else:
+                self.InvalidResponse(i)
+
+    def ClearText(self,i,event=None):
+        self.Entries[i].delete(0, "end")
+    
+    def InvalidResponse(self,i):
+        self.ClearText(i)
+        self.Entries[i].focus()
+
+    def ValidateInd(self,i,Event=None):
+        
+        if (self.Entries[i].get() == ''):
+            self.Entries[i].insert(0, str(self.SwissPartners[i].SwissScores[self.RoundNum - 1]))
+        
+        try:
+            TempScore = int(self.Entries[i].get())
+            
+            if (TempScore < 0 or TempScore > self.Competition.ValidSwissScores[self.RoundNum - 1]):
+                    string1 = 'Entered Score for' + str(self.SwissPartners[i].Name) + ' Not Valid. \n Must be between 0 and ' + str(self.Competition.ValidSwissScores[self.RoundNum - 1]) 
+                    tkMessageBox.showwarning("Error", string1)
+                    return False
+            else:
+                self.SwissPartners[i].SwissScores[self.RoundNum - 1] = TempScore 
+                return True
+        
+        except Exception:
+                string1 = 'Entered Score for' + str(self.SwissPartners[i].Name) + ' Not A Number.'
+                tkMessageBox.showwarning("Error", string1)
+                
+                return False            
         
     def Validate(self):
-        Valid = False
-        try:
-            School1Score = int(self.School1ScoreEntry.get())
+        Valids = []
+        
+        for i in range(len(self.Entries)):
             
-            if (School1Score < 0 or School1Score > self.Competition.ValidSwissScores[self.RoundNum - 1]):
-                string1 = 'Entered Score for ' + self.SwissPartners[0].Name + ' Not Valid. \n Must be between 0 and ' + str(self.Competition.ValidSwissScores[self.RoundNum - 1]) 
-                tkMessageBox.showwarning("Error", string1)
-            else:
-                #Assign The Value
-                Valid = True
-                self.SwissPartners[0].SwissScores[self.RoundNum-1] = School1Score
+            if (self.Entries[i].get() == ''):
+                self.Entries[i].insert(0, str(self.SwissPartners[i].SwissScores[self.RoundNum - 1]))
+         
+            try:
+                TempScore = int(self.Entries[i].get())
                 
-        except Exception:
-            string1 = 'Entered Score for ' + self.SwissPartners[0].Name + ' Not A Number.'
-            tkMessageBox.showwarning("Error", string1)
-            #ZeroTKVal = tk.StringVar(self.master, value=str(0))
-            #self.School1ScoreEntry.set(ZeroTKVal)
-            
-        try:
-            School2Score = int(self.School2ScoreEntry.get())
-            
-            if (School2Score < 0 or School2Score  > self.Competition.ValidSwissScores[self.RoundNum - 1]):
-                string1 = 'Entered Score for ' + self.SwissPartners[1].Name + ' Not Valid. \n Must be between 0 and ' + str(self.Competition.ValidSwissScores[self.RoundNum - 1]) 
+                if (TempScore < 0 or TempScore > self.Competition.ValidSwissScores[self.RoundNum - 1]):
+                        string1 = 'Entered Score for' + str(self.SwissPartners[i].Name) + ' Not Valid. \n Must be between 0 and ' + str(self.Competition.ValidSwissScores[self.RoundNum - 1]) 
+                        tkMessageBox.showwarning("Error", string1)
+                        Valids.append(False)
+                else:
+                    self.SwissPartners[i].SwissScores[self.RoundNum - 1] = TempScore 
+                    Valids.append(True)
+                    
+            except Exception:
+                string1 = 'Entered Score for' + str(self.SwissPartners[i].Name) + ' Not A Number.'
                 tkMessageBox.showwarning("Error", string1)
-                Valid = False
-            else:
-                self.SwissPartners[1].SwissScores[self.RoundNum-1] = School2Score
+                Valids.append(False)
+        
+        if False in Valids:
+            return False
+        else:
+            
+            if (self.SwissPartners[0].SwissScores[self.RoundNum - 1] + self.SwissPartners[1].SwissScores[self.RoundNum - 1] != self.Competition.ValidSwissScores[self.RoundNum - 1]):
+                string1 = 'Entered Scores for Teams Do Not Add To ' +str(self.Competition.ValidSwissScores[self.RoundNum - 1]) 
+                tkMessageBox.showwarning("Error", string1)
+                return False
                 
-        except Exception:
-            Valid = False
-            string1 = 'Entered Score for ' + self.SwissPartners[1].Name + ' Not A Number.'
-            tkMessageBox.showwarning("Error", string1)
-            #ZeroTKVal = tk.StringVar(self.master, value=str(0))
-            #self.School1ScoreEntry.set(ZeroTKVal)
-            #Valid
-        if (Valid):
             self.Competition.WriteToFile()
-        return Valid
+            return True
 
     def ChooseSchoolName(self,Key,event=None):
         
@@ -767,6 +887,18 @@ class CrossContestBody:
             TempEntryVal = tk.StringVar(value=str(self.School.CrossScores[i]))
             self.Entries.append(tk.Entry(F1f2, textvariable=TempEntryVal,width=4,bd = 4, font=self.TitleFont))
             self.Entries[i].grid(row=2*(i/GroupNum) + 1,column=i%GroupNum)
+            
+            EntryClearTest = partial(self.ClearText, i)
+            self.Entries[i].bind('<FocusIn>', EntryClearTest)
+            
+            ValidateOnLeave = partial(self.ValidateFocusLeft, i)
+            self.Entries[i].bind('<FocusOut>', ValidateOnLeave)
+        
+
+        for i in range(len(self.Entries)):
+            EntryNext = partial(self.NextEntry, i,len(self.Entries))
+            self.Entries[i].bind('<Return>', EntryNext)
+             
         
         
         F2 = tk.Frame(self.master,height=10,width=10, bd=1)
@@ -779,10 +911,68 @@ class CrossContestBody:
         BackBut.grid(row = 1, column = 2)
         
         
+    def ValidateFocusLeft(self,i,event=None):
+        if( not self.ValidateInd(i)):
+            self.Entries[i].focus()
+
+        
+    def NextEntry(self,i,n,event=None):
+        if (i < n -1):
+            
+            if(self.ValidateInd(i)):
+                self.Entries[i+1].focus()
+            else:
+                self.InvalidResponse(i)
+        else:
+            
+            if(self.ValidateInd(i)):
+                #Current School Index =
+                Curi = self.Competition.SchoolList.index(self.School)
+                
+                self.Competition.WriteToFile()
+                self.SchoolKey = self.Competition.SchoolList[ (Curi + 1) % len(self.Competition.SchoolList)].Key
+                
+                self.ReloadScreen()
+                
+            else:
+                self.InvalidResponse(i)
+
+    def ClearText(self,i,event=None):
+        self.Entries[i].delete(0, "end")
+    
+    def InvalidResponse(self,i):
+        self.ClearText(i)
+        self.Entries[i].focus()
+
+    def ValidateInd(self,i,Event=None):
+        
+        if (self.Entries[i].get() == ''):
+            self.Entries[i].insert(0, str(self.School.CrossScores[i]))
+        
+        try:
+            TempScore = int(self.Entries[i].get())
+            
+            if (TempScore < 0 or TempScore > self.Competition.ValidCrossScores[i]):
+                    string1 = 'Entered Score for Q' + str(self.Competition.ValidCrossNames[i]) + ' Not Valid. \n Must be between 0 and ' + str(self.Competition.ValidCrossScores[i]) 
+                    tkMessageBox.showwarning("Error", string1)
+                    return False
+            else:
+                self.School.CrossScores[i] = TempScore 
+                return True
+        
+        except Exception:
+                string1 = 'Entered Score for Q' + str(self.Competition.ValidCrossNames[i]) + ' Not A Number.'
+                tkMessageBox.showwarning("Error", string1)
+                
+                return False
+
     def Validate(self):
         Valids = []
         
         for i in range(len(self.Competition.ValidCrossScores)):
+            
+            if (self.Entries[i].get() == ''):
+                self.Entries[i].insert(0, str(self.School.CrossScores[i]))
          
             try:
                 TempScore = int(self.Entries[i].get())
@@ -895,6 +1085,18 @@ class RelayContestBody:
             TempEntryVal = tk.StringVar(value=str(self.School.RelayScores[i]))
             self.Entries.append(tk.Entry(F1f2, textvariable=TempEntryVal,width=4,bd = 4, font=self.TitleFont))
             self.Entries[i].grid(row=2*(i/GroupNum) + 1,column=i%GroupNum)
+            
+            
+            EntryClearTest = partial(self.ClearText, i)
+            self.Entries[i].bind('<FocusIn>', EntryClearTest)
+            
+            ValidateOnLeave = partial(self.ValidateFocusLeft, i)
+            self.Entries[i].bind('<FocusOut>', ValidateOnLeave)
+        
+        #All widgets need to be created for next to work
+        for i in range(len(self.Entries)):
+            EntryNext = partial(self.NextEntry, i,len(self.Entries))
+            self.Entries[i].bind('<Return>', EntryNext)
         
         
         F2 = tk.Frame(self.master,height=10,width=10, bd=1)
@@ -907,10 +1109,68 @@ class RelayContestBody:
         BackBut.grid(row = 1, column = 2)
         
         
+    def ValidateFocusLeft(self,i,event=None):
+        if( not self.ValidateInd(i)):
+            self.Entries[i].focus()
+
+        
+    def NextEntry(self,i,n,event=None):
+        if (i < n -1):
+            
+            if(self.ValidateInd(i)):
+                self.Entries[i+1].focus()
+            else:
+                self.InvalidResponse(i)
+        else:
+            
+            if(self.ValidateInd(i)):
+                #Current School Index =
+                Curi = self.Competition.SchoolList.index(self.School)
+                
+                self.Competition.WriteToFile()
+                self.SchoolKey = self.Competition.SchoolList[ (Curi + 1) % len(self.Competition.SchoolList)].Key
+                
+                self.ReloadScreen()
+                
+            else:
+                self.InvalidResponse(i)
+
+    def ClearText(self,i,event=None):
+        self.Entries[i].delete(0, "end")
+    
+    def InvalidResponse(self,i):
+        self.ClearText(i)
+        self.Entries[i].focus()
+
+    def ValidateInd(self,i,Event=None):
+        
+        if (self.Entries[i].get() == ''):
+            self.Entries[i].insert(0, str(self.School.RelayScores[i]))
+        
+        try:
+            TempScore = int(self.Entries[i].get())
+            
+            if (TempScore < 0 or TempScore > self.Competition.ValidRelayScores[i]):
+                    string1 = 'Entered Score for Q' + str(self.Competition.ValidRelayNames[i]) + ' Not Valid. \n Must be between 0 and ' + str(self.Competition.ValidRelayScores[i]) 
+                    tkMessageBox.showwarning("Error", string1)
+                    return False
+            else:
+                self.School.RelayScores[i] = TempScore 
+                return True
+        
+        except Exception:
+                string1 = 'Entered Score for Q' + str(self.Competition.ValidRelayNames[i]) + ' Not A Number.'
+                tkMessageBox.showwarning("Error", string1)
+                
+                return False
+
     def Validate(self):
         Valids = []
         
         for i in range(len(self.Competition.ValidRelayScores)):
+            
+            if (self.Entries[i].get() == ''):
+                self.Entries[i].insert(0, str(self.School.RelayScores[i]))
          
             try:
                 TempScore = int(self.Entries[i].get())
