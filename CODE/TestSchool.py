@@ -3,23 +3,23 @@ from Lib.Structures.Structs import CompetitionSchool,PreviousSchool,RegisteredSc
 
 MasterFileSchool = './Data/Master/Schools.csv'
 MasterDir = './Data/Master/'
-CompFile = './Data/Test/Competition.csv'
+CompFile = './Data/ScoreTest/Competition.csv'
 
 
-PrevList = PreviousSchoolList(MasterFile=MasterFileSchool)
-PrevList.ReadFromFile()
+#PrevList = PreviousSchoolList(MasterFile=MasterFileSchool)
+#PrevList.ReadFromFile()
 
-RegisterList = [PrevList.SchoolList[1].Register('A1'),PrevList.SchoolList[2].Register('A3'),PrevList.SchoolList[3].Register('A2')]
-RegisterSchoolList = RegisterSchoolList(RegisterList)
+#RegisterList = [PrevList.SchoolList[1].Register('A1'),PrevList.SchoolList[2].Register('A3'),PrevList.SchoolList[3].Register('A2')]
+#RegisterSchoolList = RegisterSchoolList(RegisterList)
 
 Comp1 = CompetitionSchoolList(File=CompFile,MasterDir=MasterDir)
 
-Comp1.CompeteRegistered(RegisterSchoolList)
+#Comp1.CompeteRegistered(RegisterSchoolList)
 
-Comp1.SchoolList[0].SwissPartners[0] = 'A2'
-Comp1.SchoolList[0].SwissSites[0] = 'A1'
+#Comp1.SchoolList[0].SwissPartners[0] = 'A2'
+#Comp1.SchoolList[0].SwissSites[0] = 'A1'
 
-Comp1.WriteToFile()
+#Comp1.WriteToFile()
 
 Comp1.ReadFromFile()
 

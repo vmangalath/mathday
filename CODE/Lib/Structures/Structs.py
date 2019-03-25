@@ -2,6 +2,7 @@ import csv
 import random
 import copy
 import string
+import numpy
 from ..Functions.Functions import NextKey     
 
 class PreviousSchool:
@@ -33,6 +34,11 @@ class CompetitionSchool(RegisteredSchool):
         self.SwissScores = SwissScores
         self.CrossScores = CrossScores
         self.RelayScores = RelayScores
+        
+        self.AllScoreDict = {'Group': self.GroupScores, \
+                                   'Swiss': self.SwissScores, \
+                                   'Cross': self.CrossScores, \
+                                   'Relay': self.RelayScores}
         
         self.SwissPartners = SwissPartners
         self.SwissSites = SwissSites
@@ -197,6 +203,8 @@ class CompetitionSchoolList:
         self.MasterDir = MasterDir
         self.DataDir = DataDir
         
+        self.CompDataDir = "/".join(self.File.split('/')[:-1]) + "/"
+        
         self.Contests = ['Group', 'Swiss', 'Cross', 'Relay']
         
         self.ValidGroupScores = []
@@ -208,8 +216,11 @@ class CompetitionSchoolList:
         self.ValidCrossNames = []
         self.ValidRelayNames = []
         
-        self.ValidScores = [self.ValidGroupScores,self.ValidSwissScores, self.ValidCrossScores, self.ValidRelayScores]
-        self.ValidNames = [self.ValidGroupNames,self.ValidSwissNames, self.ValidCrossNames, self.ValidRelayNames]
+        
+        self.ValidNameScoreDict = {'Group': (self.ValidGroupNames, self.ValidGroupScores), \
+                                   'Swiss': (self.ValidSwissNames, self.ValidSwissScores), \
+                                   'Cross': (self.ValidCrossNames, self.ValidCrossScores), \
+                                   'Relay': (self.ValidRelayNames, self.ValidRelayScores)}
         
         self.ValidSwissSites = []
         
@@ -232,8 +243,8 @@ class CompetitionSchoolList:
                 j = -1
                 for row in readfile:       
                     if (j >= 0):
-                        self.ValidNames[i].append(row[0])
-                        self.ValidScores[i].append(int(row[1]))                       
+                        self.ValidNameScoreDict[self.Contests[i]][0].append(row[0])
+                        self.ValidNameScoreDict[self.Contests[i]][1].append(int(row[1]))                     
                     j = j + 1
         
     def CompeteRegistered(self,RegisteredSchoolList):
@@ -276,24 +287,29 @@ class CompetitionSchoolList:
     def WriteToFile(self):
         
         self.SortList()
+        
         with open(self.File ,'w') as file1:
             writefile = csv.writer(file1, delimiter = ',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             
             HeaderList = ['Key','Name','Location','Historical Z-Score']
-            for i in range(len(self.ValidNames)):
-                for j in range(len(self.ValidNames[i])):
-                    nameij = self.Contests[i] + " Q" + str(self.ValidNames[i][j]) + " "
+            
+            #Maintains the order, as dictionaries are unordered
+            for DictKey in self.Contests:
+                
+                for j in range(len(self.ValidNameScoreDict[DictKey][0])):
+                    nameij = DictKey + self.ValidNameScoreDict[DictKey][0][j] + " "
                     HeaderList.append(nameij)
                         
             #SwissAdminStuff
             #Partners
-            for j in range(len(self.ValidNames[1])):
-                nameij = self.Contests[1] + " Q" + str(self.ValidNames[1][j]) + " Partner"
+            DictKey = 'Swiss'
+            for j in range(len(self.ValidNameScoreDict[DictKey][0])):
+                nameij = DictKey +  self.ValidNameScoreDict[DictKey][0][j] + " Partner"
                 HeaderList.append(nameij)
             
             #Swiss Sites
-            for j in range(len(self.ValidNames[1])):
-                nameij = self.Contests[1] + " Q" + str(self.ValidNames[1][j]) + " Sites"
+            for j in range(len(self.ValidNameScoreDict[DictKey][0])):
+                nameij = DictKey + self.ValidNameScoreDict[DictKey][0][j] + " Sites"
                 HeaderList.append(nameij)
                     
             writefile.writerow(HeaderList)
@@ -319,9 +335,9 @@ class CompetitionSchoolList:
                     
                     AllScores = []
                     ijtot = 4
-                    for i in range(len(self.ValidScores)):
+                    for DictKey in self.Contests:
                         Scores = []
-                        for j in range(len(self.ValidScores[i])):
+                        for j in range(len(self.ValidNameScoreDict[DictKey][1])):
                             Scores.append(int(row[ijtot]))
                             ijtot = ijtot + 1
                         AllScores.append(Scores)
@@ -329,7 +345,7 @@ class CompetitionSchoolList:
                     #Read Swiss Partners and Sites
                     for i in range(2):
                             Scores = []
-                            for j in range(len(self.ValidScores[1])):
+                            for j in range(len(self.ValidNameScoreDict['Swiss'][1])):
                                 Scores.append((row[ijtot]))
                                 ijtot = ijtot + 1   
                             AllScores.append(Scores)
@@ -400,8 +416,40 @@ class CompetitionSchoolList:
         
         for School in self.SchoolList:
             School.TotalUpdate(ContestString)
+    
+    def FindSwissSite(self,RoundNum,Site):
+        return filter(lambda School: School.SwissSites[RoundNum-1] == Site, self.SchoolList)
+
         
-    def GenerateSwissPartners(self,RoundNum=1):
+    def GetSwissPartnersBySite(self,RoundNum):
+        SwissSites = []
+        for Site in self.ValidSwissSites:
+            Schools = self.FindSwissSite(RoundNum,Site)
+            SwissSites.append((Site,Schools))
+        return SwissSites
+    
+    def PrintSwissPartners(self,RoundNum):
+        
+        SwissSites = self.GetSwissPartnersBySite(RoundNum)
+        
+        FileName = self.CompDataDir  + "SwissRound" + str(RoundNum)+ ".csv"
+        
+        
+        with open(FileName ,'w') as file1:
+            writefile = csv.writer(file1, delimiter = ',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            
+            writefile.writerow(['Round ' + str(RoundNum),'',''])
+            writefile.writerow(['','',''])
+            writefile.writerow(['Site','School Keys','School Names'])
+            
+            for Site in SwissSites:
+                writefile.writerow([str(Site[0]),str(Site[1][0].Key),str(Site[1][0].Name)])
+                writefile.writerow(['',str(Site[1][1].Key),str(Site[1][1].Name)])
+                writefile.writerow(['','',''])
+
+        
+        
+    def GenerateSwissPartners(self,RoundNum):
         
         #Clear Previous Swiss Data
         self.ClearAllSwiss(RoundNum)
@@ -409,9 +457,12 @@ class CompetitionSchoolList:
         #Take Group Scores 1 through 8
         ContestString = ['G1to8']
         
-        for i in range(RoundNum):
+        
+        for i in range(RoundNum -2):
             RoundString = 'SQ' + str(i+1)
             ContestString.append(RoundString)
+            
+        #print(ContestString)
         
         #Update Totals
         self.UpdateTotalsSchool(ContestString)
@@ -469,129 +520,48 @@ class CompetitionSchoolList:
         else:
             #print "Swiss Site Error"
             return None
-            
-        
 
-    
+    def PrintFinal(self):
+        print('Final')
+        
+        #Get School Totals
+        self.UpdateTotalsSchool(['A'])
+        
+        
+        #Generate Individual School Report
+            
     """    
-    def ReadFile(self):
-        with open(self.File,'r') as file1:
-            readfile = csv.reader(file1, delimiter = ',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            
-            j = -1
-            for row in readfile:       
-                if (j >= 0):
-                    
-                    School = CompetitionSchool(row[0],row[1],row[2],row[3])
-                    
-                    AllScores = []
-                    rowplace = 4
-                    for i in range(len(self.ContestValidMaxScores)):
-                        TempScores = []
-                        for k in range(len(self.ContestValidMaxScores[i])):
-                            TempScores.append(int(row[rowplace]))
-                            rowplace = rowplace + 1
-                        AllScores.append(TempScores)
-                            
-                    
-                    CurrSchool = School(CurrSchoolKey,CurrSchoolName,CurrSchoolLocation,CurrSchoolHistoricalZScore,AllScores[0],AllScores[1],AllScores[2],AllScores[3])
-                        
-                    #Validate Here                    
-                    self.SchoolDict[CurrSchoolKey] = CurrSchool
-                    
-            
-                j = j + 1
+    def PrintFinal(self):
+        print('Final')
+        TotalRankings = self.TotalRankingsAndZScore()
+        print(TotalRankings)
         
+    def TotalRankingsAndZScore(self):
+        
+        #Get school totals
+        self.UpdateTotalsSchool(['A'])
+        
+        #Order SchoolList by Scores
+        self.SortListScores()
+        
+        #Get Mean and Standarddeviation
+        
+        ScoreRankings = []
+        for School in self.SchoolList:
+            ScoreRankings.append(School.Total)
+            
+        ScoreMean = numpy.mean(ScoreRankings)
+        ScoreStd = numpy.std(ScoreRankings)
+        
+        TotalRankings = []
+        i = 1
+        
+        for School in self.SchoolList:
+            ZScore = (School.Total - ScoreMean)/ScoreStd
+            TotalRankings.append((i,School.Name,School.Total,School.HistZScore,ZScore))
+            i = i +1
+        return TotalRankings
     """
-            
-
-
-"""        
-class PreviousSchoolList:
-    
-     
-class Competition:
-    
-    def __init__(self,Directory,MasterLocation):
         
-        self.Directory = Directory
-        self.FileName = self.Directory + "Competition.csv"
-        self.MasterLocation = MasterLocation
-        self.Contests = ['Group', 'Swiss', 'Cross', 'Relay']
-        self.ContestValidMaxScores = []
-        self.SchoolDict = {}
         
-        self.ReadInitFiles()
         
-        self.ReadFile()
-        
-    def ReadInitFiles(self):
-        
-        for ContestName in self.Contests:
-            
-            FileNameTemp = self.MasterLocation + "Scores/" + ContestName + "ContestScores.csv"
-            ContestQuestionNameScoreTemp = []
-            
-            with open(FileNameTemp,'r') as file1:
-                readfile = csv.reader(file1, delimiter = ',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            
-                j = -1
-                for row in readfile:       
-                    if (j >= 0):
-                        ContestQuestionNameScoreTemp.append( (row[0], int(row[1])))                        
-                    j = j + 1
-            self.ContestValidMaxScores.append(ContestQuestionNameScoreTemp)
-            
-        
-    def ReadFile(self):
-        with open(self.FileName,'r') as file1:
-            readfile = csv.reader(file1, delimiter = ',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            
-            j = -1
-            for row in readfile:       
-                if (j >= 0):
-                    
-                    CurrSchoolKey = row[0]
-                    CurrSchoolName = row[1]
-                    CurrSchoolLocation = row[2]
-                    CurrSchoolHistoricalZScore = row[3]
-                    
-                    AllScores = []
-                    rowplace = 4
-                    for i in range(len(self.ContestValidMaxScores)):
-                        TempScores = []
-                        for k in range(len(self.ContestValidMaxScores[i])):
-                            TempScores.append(int(row[rowplace]))
-                            rowplace = rowplace + 1
-                        AllScores.append(TempScores)
-                            
-                    
-                    CurrSchool = School(CurrSchoolKey,CurrSchoolName,CurrSchoolLocation,CurrSchoolHistoricalZScore,AllScores[0],AllScores[1],AllScores[2],AllScores[3])
-                        
-                    #Validate Here                    
-                    self.SchoolDict[CurrSchoolKey] = CurrSchool
-                    
-            
-                j = j + 1
-            
-    def GenerateFiles(self):
-    
-    def WriteFile(self):
-        
-        with open(self.FileName,'w') as file1:
-            writefile = csv.writer(file1, delimiter = ',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        
-            writefile.writerow(["School Key","School Name", "Status","Historical Z Score","Score Comp1 Q1","Score Comp1 Q2","Score Comp1 Q3","Score Comp1 Q4","Score Comp1 Q5","Score Comp1 Q6","Score Comp1 Q7","Score Comp1 Q8","Score Comp1 Q9","Score Comp1 Q10", \
-    "Score Comp2 Q1","Score Comp2 Q2","Score Comp2 Q3","Score Comp2 Q4","Score Comp2 Q5", \
-    "Score Comp3 Q1","Score Comp3 Q2","Score Comp3 Q3","Score Comp3 Q4","Score Comp3 Q5","Score Comp3 Q6","Score Comp3 Q7","Score Comp3 Q8","Score Comp3 Q9","Score Comp3 Q10","Score Comp3 Q11","Score Comp3 Q12","Score Comp3 Q13","Score Comp3 Q14","Score Comp3 Q15","Score Comp3 Q16","Score Comp3 Q17","Score Comp3 Q18","Score Comp3 Q19","Score Comp3 Q20" \
-    ])  
-                      
-            for SchoolKey, School in self.SchoolDict.iteritems():
-                GroupScoreStr = map(str, School.GroupScores)
-                SwissScoreStr = map(str, School.SwissScores)
-                CrossScoreStr = map(str, School.CrossScores)
-                rowwrite = [str(School.Key), str(School.Name), str(School.Loc) , str(School.HistZ)  ] + GroupScoreStr + SwissScoreStr + CrossScoreStr
-                writefile.writerow(rowwrite)
-        
-"""
-    

@@ -1,0 +1,165 @@
+\documentclass{article}
+\addtolength{\oddsidemargin}{-1.375in}
+\addtolength{\evensidemargin}{-1.375in}
+\addtolength{\textwidth}{1.75in}
+
+\addtolength{\topmargin}{-.875in}
+\addtolength{\textheight}{1.75in}
+
+\newcommand{\SchoolName}{!SchoolName!}
+\newcommand{\SchoolLocation}{!SchoolLocation!}
+\newcommand{\SchoolTotal}{!SchoolTotal!}
+\newcommand{\SchoolGroupTotal}{!SchoolGroupTotal!}
+
+\newcommand{\SchoolGroupQa}{!SchoolGroupQ1!}
+\newcommand{\SchoolGroupQb}{!SchoolGroupQ2!}
+\newcommand{\SchoolGroupQc}{!SchoolGroupQ3!}
+\newcommand{\SchoolGroupQd}{!SchoolGroupQ4!}
+\newcommand{\SchoolGroupQe}{!SchoolGroupQ5!}
+\newcommand{\SchoolGroupQf}{!SchoolGroupQ6!}
+\newcommand{\SchoolGroupQg}{!SchoolGroupQ7!}
+\newcommand{\SchoolGroupQh}{!SchoolGroupQ8!}
+\newcommand{\SchoolGroupQi}{!SchoolGroupQ9!}
+\newcommand{\SchoolGroupQj}{!SchoolGroupQ10!}
+
+\newcommand{\SchoolSwissTotal}{!SchoolSwissTotal!}
+\newcommand{\SchoolSwissQa}{!SchoolSwissQ1!}
+\newcommand{\SchoolSwissQb}{!SchoolSwissQ2!}
+\newcommand{\SchoolSwissQc}{!SchoolSwissQ3!}
+\newcommand{\SchoolSwissQd}{!SchoolSwissQ4!}
+\newcommand{\SchoolSwissQe}{!SchoolSwissQ5!}
+
+\newcommand{\SchoolCrossTotal}{!SchoolCrossTotal!}
+\newcommand{\SchoolCrossQa}{!SchoolCrossQ1!}
+\newcommand{\SchoolCrossQb}{!SchoolCrossQ21}
+\newcommand{\SchoolCrossQc}{!SchoolCrossQ3!}
+\newcommand{\SchoolCrossQd}{!SchoolCrossQ4!}
+
+\newcommand{\SchoolRelayTotal}{!SchoolRelayTotal!}
+
+\newcommand{\SchoolRelayQa}{!SchoolRelayQ1!}
+\newcommand{\SchoolRelayQb}{!SchoolRelayQ2!}
+\newcommand{\SchoolRelayQc}{!SchoolRelayQ3!}
+\newcommand{\SchoolRelayQd}{!SchoolRelayQ4!}
+\newcommand{\SchoolRelayQe}{!SchoolRelayQ5!}
+\newcommand{\SchoolRelayQf}{!SchoolRelayQ6!}
+\newcommand{\SchoolRelayQg}{!SchoolRelayQ7!}
+\newcommand{\SchoolRelayQh}{!SchoolRelayQ8!}
+\newcommand{\SchoolRelayQi}{!SchoolRelayQ9!}
+\newcommand{\SchoolRelayQj}{!SchoolRelayQ10!}
+\newcommand{\SchoolRelayQk}{!SchoolRelayQ11!}
+\newcommand{\SchoolRelayQl}{!SchoolRelayQ12!}
+\newcommand{\SchoolRelayQm}{!SchoolRelayQ13!}
+\newcommand{\SchoolRelayQn}{!SchoolRelayQ14!}
+\newcommand{\SchoolRelayQo}{!SchoolRelayQ15!}
+\newcommand{\SchoolRelayQp}{!SchoolRelayQ16!}
+\newcommand{\SchoolRelayQq}{!SchoolRelayQ17!}
+\newcommand{\SchoolRelayQr}{!SchoolRelayQ18!}
+\newcommand{\SchoolRelayQs}{!SchoolRelayQ19!}
+\newcommand{\SchoolRelayQt}{!SchoolRelayQ20!}
+
+
+\newcommand\T{\rule{0pt}{4ex }}       % Top table strut
+\newcommand\B{\rule[-2ex]{0pt}{2ex }} % Bottom table strut
+\begin{document}
+
+\begin{tabular}{|p{0.333\textwidth}|p{0.333\textwidth}|p{0.334\textwidth}|}
+	\hline
+	Name & Location & Total \T\B \\
+	\hline
+	\SchoolName & \SchoolLocation & \SchoolTotal   \T\B\\
+	\hline
+\end{tabular}
+
+
+\fbox{
+\begin{minipage}{\textwidth}
+%Group Score Table
+
+Group Scores \\
+
+\begin{tabular}{|p{0.17\textwidth}|p{0.17\textwidth}|p{0.17\textwidth}|p{0.17\textwidth}|p{0.17\textwidth}|}
+	\hline
+	Q1 & Q2 & Q3 &Q4 & Q5 \T\B \\
+	\hline
+	\SchoolGroupQa & \SchoolGroupQb & \SchoolGroupQc & \SchoolGroupQd & \SchoolGroupQe   \T\B\\
+	\hline
+	\hline
+	Q6 & Q7 & Q8 &Q9 & Q10 \T\B \\
+	\hline
+	\SchoolGroupQf & \SchoolGroupQg & \SchoolGroupQh & \SchoolGroupQi & \SchoolGroupQj   \T\B\\
+	\hline
+\end{tabular}
+
+Total :  \SchoolGroupTotal
+\end{minipage}
+}
+
+\fbox{
+\begin{minipage}{\textwidth}
+%Swiss Score Table
+Swiss Scores
+
+\begin{tabular}{|p{0.17\textwidth}|p{0.17\textwidth}|p{0.17\textwidth}|p{0.17\textwidth}|p{0.17\textwidth}|}
+	\hline
+	Round 1 & Round 2 & Round 3 & Round 4 & Round 5 \T\B \\
+	\hline
+	\SchoolSwissQa & \SchoolSwissQb & \SchoolSwissQc & \SchoolSwissQd & \SchoolSwissQe   \T\B\\
+	\hline
+\end{tabular}
+Total :  \SchoolSwissTotal
+\end{minipage}
+}
+
+\fbox{
+\begin{minipage}{\textwidth}
+%Cross Score Table
+Cross Scores
+
+\begin{tabular}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|}
+	\hline
+	Q1 & Q2 & Q3 & Q4 \T\B \\
+	\hline
+	\SchoolCrossQa & \SchoolCrossQb & \SchoolCrossQc & \SchoolCrossQd \T\B\\
+	\hline
+\end{tabular}
+
+Total :  \SchoolCrossTotal
+\end{minipage}
+}
+
+\fbox{
+\begin{minipage}{\textwidth}
+%Relay Score Table
+Relay Scores
+
+\begin{tabular}{|p{0.17\textwidth}|p{0.17\textwidth}|p{0.17\textwidth}|p{0.17\textwidth}|p{0.17\textwidth}|}
+	\hline
+	Q1 & Q2 & Q3 &Q4 & Q5 \T\B \\
+	\hline
+	\SchoolRelayQa & \SchoolRelayQb & \SchoolRelayQc & \SchoolRelayQd & \SchoolRelayQe   \T\B\\
+	\hline
+	\hline
+	Q6 & Q7 & Q8 &Q9 & Q10 \T\B \\
+	\hline
+	\SchoolRelayQf & \SchoolRelayQg & \SchoolRelayQh & \SchoolRelayQi & \SchoolRelayQj   \T\B\\
+	\hline
+	\hline
+	Q11 & Q12 & Q13 &Q14 & Q15 \T\B \\
+	\hline
+	\SchoolRelayQk & \SchoolRelayQl & \SchoolRelayQm & \SchoolRelayQn & \SchoolRelayQo   \T\B\\
+	\hline
+	\hline
+	Q16 & Q17 & Q18 &Q19 & Q20 \T\B \\
+	\hline
+	\SchoolRelayQp & \SchoolRelayQq & \SchoolRelayQr & \SchoolRelayQs & \SchoolRelayQt   \T\B\\
+	\hline
+\end{tabular}
+Total :  \SchoolRelayTotal
+\end{minipage}
+}
+
+
+
+	
+\end{document}

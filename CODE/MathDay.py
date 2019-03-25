@@ -13,9 +13,9 @@ from Lib.Windows.Menu import LoadMainMenu
 
 root = tk.Tk()
 
-LargeTitleFont = tkFont.Font(family='Courier', size=24, weight='bold')
-MedTitleFont = tkFont.Font(family='Courier', size=18)
-BodyFont = tkFont.Font(family='Courier', size=12) 
+LargeTitleFont = tkFont.Font(family='Courier', size=18, weight='bold')
+MedTitleFont = tkFont.Font(family='Courier', size=14)
+BodyFont = tkFont.Font(family='Courier', size=10) 
 
 
 Menu1 = LoadMainMenu(root,LargeTitleFont,MedTitleFont,BodyFont)

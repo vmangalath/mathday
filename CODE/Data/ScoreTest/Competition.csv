@@ -1,9 +1,9 @@
-Key,Name,Location,Historical Z-Score,Group Q1 ,Group Q2 ,Group Q3 ,Group Q4 ,Group Q5 ,Group Q6 ,Group Q7 ,Group Q8 ,Group Q9 ,Group Q10 ,Swiss Q1 ,Swiss Q2 ,Swiss Q3 ,Swiss Q4 ,Swiss Q5 ,Cross Q1 ,Cross Q2 ,Cross Q3 ,Cross Q4 ,Relay Q1 ,Relay Q2 ,Relay Q3 ,Relay Q4 ,Relay Q5 ,Relay Q6 ,Relay Q7 ,Relay Q8 ,Relay Q9 ,Relay Q10 ,Relay Q11 ,Relay Q12 ,Relay Q13 ,Relay Q14 ,Relay Q15 ,Relay Q16 ,Relay Q17 ,Relay Q18 ,Relay Q19 ,Relay Q20 ,Swiss Q1 Partner,Swiss Q2 Partner,Swiss Q3 Partner,Swiss Q4 Partner,Swiss Q5 Partner,Swiss Q1 Sites,Swiss Q2 Sites,Swiss Q3 Sites,Swiss Q4 Sites,Swiss Q5 Sites
-A1,Abbotsleigh,Country,-0.189999998,12,5,1,1,1,0,0,1,1,1,12,0,0,0,0,1,2,2,3,5,5,5,5,5,5,5,5,5,5,5,1,4,4,4,4,4,4,4,4,A3,,,,,B3,,,,
-A2,Batemans Bay High School,Country,-1.1597687,2,2,2,2,2,2,2,2,2,2,15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B2,,,,,A3,,,,
-A3,Bega High School,Country,-0.0141234994,3,3,3,3,3,3,3,3,3,3,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,A1,,,,,B3,,,,
-A4,Bishop Tyrrell Anglican College,City,-0.415523291,7,7,7,7,7,7,7,7,7,7,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B4,,,,,B1,,,,
-B1,Bomaderry High School,Country,-0.699910641,4,4,4,4,4,4,4,4,4,4,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B3,,,,,A1,,,,
-B2,Braidwood Central School,Country,-0.731809735,1,2,2,2,2,2,2,2,2,2,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,A2,,,,,A3,,,,
-B3,Lake Tuggeranong College,City,-0.404649973,5,5,5,5,5,5,5,5,5,5,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,B1,,,,,A1,,,,
-B4,Nowra High School,Country,-0.37916398,8,8,8,8,8,8,8,8,8,8,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,A4,,,,,B1,,,,
+Key,Name,Location,Historical Z-Score,GroupQ1 ,GroupQ2 ,GroupQ3 ,GroupQ4 ,GroupQ5 ,GroupQ6 ,GroupQ7 ,GroupQ8 ,GroupQ9 ,GroupQ10 ,SwissRound1 ,SwissRound2 ,SwissRound3 ,SwissRound4 ,SwissRound5 ,CrossQ1 ,CrossQ2 ,CrossQ3 ,CrossQ4 ,RelayQ1 ,RelayQ2 ,RelayQ3 ,RelayQ4 ,RelayQ5 ,RelayQ6 ,RelayQ7 ,RelayQ8 ,RelayQ9 ,RelayQ10 ,RelayQ11 ,RelayQ12 ,RelayQ13 ,RelayQ14 ,RelayQ15 ,RelayQ16 ,RelayQ17 ,RelayQ18 ,RelayQ19 ,RelayQ20 ,SwissRound1 Partner,SwissRound2 Partner,SwissRound3 Partner,SwissRound4 Partner,SwissRound5 Partner,SwissRound1 Sites,SwissRound2 Sites,SwissRound3 Sites,SwissRound4 Sites,SwissRound5 Sites
+A1,Abbotsleigh,Country,-0.189999998,1,2,3,4,5,6,7,8,9,10,0,0,0,0,0,1,2,3,4,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,B3,A4,B4,B2,A2,B3,B1,A3,A1,A3
+A2,Batemans Bay High School,Country,-1.1597687,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B2,B1,A3,B3,A1,A1,A1,A1,A3,A3
+A3,Bega High School,Country,-0.0141234994,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B1,B2,A2,A4,B4,B1,B3,A1,B3,B1
+A4,Bishop Tyrrell Anglican College,City,-0.415523291,7,7,7,7,7,7,7,7,7,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B4,A1,B3,A3,B1,A3,B1,B3,B3,B3
+B1,Bomaderry High School,Country,-0.699910641,4,4,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,A3,A2,B2,B4,A4,B1,A1,B1,B1,B3
+B2,Braidwood Central School,Country,-0.731809735,1,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,A2,A3,B1,A1,B3,A1,B3,B1,A1,A1
+B3,Lake Tuggeranong College,City,-0.404649973,5,5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,A1,B4,A4,A2,B2,B3,A3,B3,A3,A1
+B4,Nowra High School,Country,-0.37916398,8,8,8,8,8,8,8,8,8,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,A4,B3,A1,B1,A3,A3,A3,A3,B1,B1
