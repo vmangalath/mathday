@@ -1,4 +1,5 @@
 import string
+import re
 
 def IsKey(Key):
      return ((Key[0] in string.ascii_uppercase) and ((int(Key[1:]) < 100) and (int(Key[1:]) > 0)) )
@@ -22,4 +23,23 @@ def NextKey(Key,PrevKey):
     return Result
     #or different letter 1
     
-    
+
+def ReplaceTemplate(TemplateFile,FinalFile,AllOutputNames):
+
+    with open(TemplateFile,'r') as SourceTemplateFile:
+        
+        with open(FinalFile,'wb') as DestinationFile:
+            
+            ReadSourceLines = SourceTemplateFile.readlines()
+            
+            for Line in ReadSourceLines:
+                
+                VarName = re.search('!(.*)!', Line)
+                
+                if (VarName != None):
+                    VarNameString = VarName.group(1)
+                    NewLine = Line.replace('!'+VarNameString+'!', AllOutputNames[VarNameString] )
+                else:
+                    NewLine = Line
+                
+                DestinationFile.write(NewLine)    

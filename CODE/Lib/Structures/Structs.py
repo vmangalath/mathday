@@ -3,7 +3,10 @@ import random
 import copy
 import string
 import numpy
-from ..Functions.Functions import NextKey     
+import scipy.stats
+import subprocess
+import os
+from ..Functions.Functions import NextKey,ReplaceTemplate     
 
 class PreviousSchool:
     def __init__(self,Name,Location,HistZScore):
@@ -45,13 +48,19 @@ class CompetitionSchool(RegisteredSchool):
         
         self.Total = sum(self.GroupScores + self.SwissScores + self.CrossScores + self.RelayScores)
         
+        
     def __str__(self):
         return "( %s , %s , %s , %s , %s , %s , %s , %s , %s , %s )" %(self.Key,self.Name,self.Location,self.HistZScore, self.GroupScores, self.SwissScores, self.CrossScores, self.RelayScores,self.SwissPartners,self.SwissSites)        
 
     def Listify(self):
         return [self.Key,self.Name,self.Location,self.HistZScore] + self.GroupScores + self.SwissScores + self.CrossScores + self.RelayScores + self.SwissPartners + self.SwissSites
     
+    def AllZerosScores(self,ContestName):        
+        return all(x == 0 for x in self.AllScoreDict[ContestName])
+   
     def TotalUpdate(self,ContestString=['A']):
+        
+        
         self.Total = 0
         for Contest in ContestString:
             
@@ -78,6 +87,26 @@ class CompetitionSchool(RegisteredSchool):
             elif(Contest == 'A'):
                 self.Total = self.Total + sum(self.GroupScores) + sum(self.SwissScores) + sum(self.CrossScores) + sum(self.RelayScores)
                 break
+            
+    def WriteReport(self,TemplateFile,SchoolFile):
+        
+        #Generate Dictionary for Value Names and Values
+        AllOutputNames = {
+                            'SchoolName' : self.Name,\
+                            'SchoolLocation' : self.Location,\
+                            'SchoolTotal' : str(self.Total)}
+        
+        for ContestKey in self.AllScoreDict:
+            for i in range(len(self.AllScoreDict[ContestKey])):
+                NewKey = 'School'+ContestKey  + 'Q'+ str(i+1) 
+                
+                AllOutputNames[NewKey] = str(self.AllScoreDict[ContestKey][i])
+                
+            NewKey = 'School'+ContestKey  + 'Total' 
+            AllOutputNames[NewKey] = str(sum(self.AllScoreDict[ContestKey]))
+            
+        ReplaceTemplate(TemplateFile,SchoolFile,AllOutputNames)
+            
             
             
 class SwissPair:
@@ -203,7 +232,14 @@ class CompetitionSchoolList:
         self.MasterDir = MasterDir
         self.DataDir = DataDir
         
-        self.CompDataDir = "/".join(self.File.split('/')[:-1]) + "/"
+        self.CompDataDir = os.path.join(os.path.split(self.File)[0], '')
+        
+        self.CompName = os.path.split(os.path.split(self.File)[0])[1]
+        
+        self.FinalReportsDir = os.path.join(self.CompDataDir,'FinalReports')
+                
+        if (not os.path.exists(self.FinalReportsDir)):
+            os.makedirs(self.FinalReportsDir)
         
         self.Contests = ['Group', 'Swiss', 'Cross', 'Relay']
         
@@ -236,7 +272,7 @@ class CompetitionSchoolList:
     def ReadInitFiles(self):
         for i in range(len(self.Contests)):
             
-            FileNameTemp = self.MasterDir + "Scores/" + self.Contests[i] + "ContestScores.csv"         
+            FileNameTemp = os.path.join( self.MasterDir, "Scores",self.Contests[i]+"ContestScores.csv"         )
             with open(FileNameTemp,'r') as file1:
                 readfile = csv.reader(file1, delimiter = ',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             
@@ -377,6 +413,23 @@ class CompetitionSchoolList:
          
     def NameInList(self,Name):
          return len(filter(lambda School: School.Name == Name, self.SchoolList)) != 0
+         
+    def AllZerosScores(self,Key,ContestName,IsSiteKey=False,RoundNum=1):
+        if ContestName == 'Swiss':
+            if IsSiteKey:
+                #Find site
+                SwissPartners = self.FindSwissSite(RoundNum,Key)
+                return (SwissPartners[0].SwissScores[RoundNum -1] == 0) and (SwissPartners[1].SwissScores[RoundNum -1] == 0)
+                
+            else:
+                SiteKey = self.FindSwissSiteBySchool(RoundNum,Key)
+                SwissPartners = self.FindSwissSite(RoundNum,SiteKey)
+                return (SwissPartners[0].SwissScores[RoundNum -1] == 0) and (SwissPartners[1].SwissScores[RoundNum -1] == 0)
+                
+        else:
+            School = self.FindKey(Key)
+            return School.AllZerosScores(ContestName)
+            
 
     def HowManyLettersInKeys(self):
         self.KeyLetterListCondensed = []
@@ -419,6 +472,10 @@ class CompetitionSchoolList:
     
     def FindSwissSite(self,RoundNum,Site):
         return filter(lambda School: School.SwissSites[RoundNum-1] == Site, self.SchoolList)
+        
+    def FindSwissSiteBySchool(self,RoundNum,SchoolKey):
+        School = self.FindKey(SchoolKey)
+        return School.SwissSites[RoundNum - 1]
 
         
     def GetSwissPartnersBySite(self,RoundNum):
@@ -432,8 +489,12 @@ class CompetitionSchoolList:
         
         SwissSites = self.GetSwissPartnersBySite(RoundNum)
         
-        FileName = self.CompDataDir  + "SwissRound" + str(RoundNum)+ ".csv"
+        SwissSitesDir = os.path.join(self.CompDataDir,'SwissSites')
         
+        if (not os.path.exists(SwissSitesDir)):
+            os.makedirs(SwissSitesDir)
+        
+        FileName = os.path.join(SwissSitesDir,"SwissRound" + str(RoundNum)+ ".csv")        
         
         with open(FileName ,'w') as file1:
             writefile = csv.writer(file1, delimiter = ',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
@@ -507,28 +568,149 @@ class CompetitionSchoolList:
         self.WriteToFile()
         
 
-        
-    
-    def SwissPartnerFindBySite(self,RoundNum=1 ,site='A1'):
-        SwissPartners = []
-        for School in self.SchoolList:
-            if(School.SwissSites[RoundNum -1] == site):
-                SwissPartners.append(School)
-        
-        if len(SwissPartners) == 2:
-            return SwissPartners
-        else:
-            #print "Swiss Site Error"
-            return None
-
     def PrintFinal(self):
         print('Final')
         
-        #Get School Totals
+        #Get School Totals and put in rank order
+        self.UpdateTotalsSchool(['A'])    
+        self.SortListScores()
+        
+        #Get Statistics
+        
+        #Get Scores
+        Scores = []
+        for School in self.SchoolList:
+            print(School.Name)
+            Scores.append(School.Total)
+            
+        ScoreMean = numpy.mean(Scores)
+        ScoreStd = numpy.std(Scores)
+        ZScores = scipy.stats.zscore(Scores)
+        
+        #Update Master File
+        self.UpdateMasterFile(ZScores)
+            
+        SchoolReportDir = os.path.join(self.FinalReportsDir, 'IndividualSchoolReports')
+            
+        if (not os.path.exists(SchoolReportDir)):
+            os.makedirs(SchoolReportDir)
+        
+        with  open(os.devnull, 'w') as DevNullFile:
+            #Generate Individual School Report
+            for School in self.SchoolList:
+                #Template File = 
+                TemplateFile = os.path.join(self.MasterDir,'ReportTemplates','Individual','IndividulSchoolTemplate.tex')
+            
+                
+                
+                RawSchoolFile = os.path.join(SchoolReportDir, School.Name.replace(' ','') + '.tex')
+                
+                #Makes Report
+                School.WriteReport(TemplateFile,RawSchoolFile)
+                
+                #Compile it
+                CallString = "pdflatex " + School.Name.replace(' ','') + '.tex'
+                subprocess.call(CallString, shell=True,cwd=SchoolReportDir,stdout=DevNullFile)  
+
+            
+        #Remove unneccessary files
+        AllFilesInDir = os.listdir(SchoolReportDir)
+        for File in AllFilesInDir:
+            if not File.endswith(".pdf"):
+                os.remove(os.path.join(SchoolReportDir, File))
+
+        
+        #Print Final Results
+        self.PrintOverall()
+        
+            
+    def GetTop10(self,Location):
         self.UpdateTotalsSchool(['A'])
+        self.SortListScores()
+        
+        if (Location == 'City' or Location == 'Country'):
+            return filter(lambda School: School.Location == Location, self.SchoolList)[:10]
+        else:
+            return self.SchoolList[:10]
+    
+    def PrintOverall(self):
+        
+        OverallReportsDir = os.path.join(self.FinalReportsDir, 'OverallReports')
+            
+        if (not os.path.exists(OverallReportsDir)):
+            os.makedirs(OverallReportsDir)
+                
+
+        TemplateFile = os.path.join(self.MasterDir,'ReportTemplates','Final','FinalTemplate.tex')
+        OverallFile = os.path.join(OverallReportsDir, 'OverallRankingTop10.tex')
+        
+        Top10Lists = ['Top','Country']
+        
+        AllOutputNames = {'ContestName': self.CompName }
+            
+        
+        for Lists in Top10Lists:
+            
+            ListResult = self.GetTop10(Lists)
+            if (len(ListResult) < 10):
+                ListResult = ListResult + (10 - len(ListResult))*['\\textcolor{white}{a}']
+                
+            for i in range(len(ListResult)):
+                NewKey = 'School' + Lists + str(i + 1)
+                
+                if ( isinstance(ListResult[i] , CompetitionSchool)):
+                    AllOutputNames[NewKey] = ListResult[i].Name[:40]
+                else:
+                    AllOutputNames[NewKey] =  ListResult[i]
+                    
+            if Lists == 'Top':
+                for i in range(3):
+                    NewKey = 'School' + Lists + str(i + 1) + 'Score'
+                
+                    if ( isinstance(ListResult[i] , CompetitionSchool)):
+                        AllOutputNames[NewKey] = str(ListResult[i].Total)
+                    else:
+                        AllOutputNames[NewKey] =  ListResult[i]
+
+        ReplaceTemplate(TemplateFile,OverallFile,AllOutputNames)
+        
+        with  open(os.devnull, 'w') as DevNullFile:
+            CallString = "pdflatex " + 'OverallRankingTop10.tex'
+            subprocess.call(CallString, shell=True,cwd=OverallReportsDir,stdout=DevNullFile)  
+
+            
+        #Remove unneccessary files
+        AllFilesInDir = os.listdir(OverallReportsDir)
+        for File in AllFilesInDir:
+            if not File.endswith(".pdf"):
+                os.remove(os.path.join(OverallReportsDir, File))
+        
+    def UpdateMasterFile(self,ZScoreList):
+        MasterFile = os.path.join(self.MasterDir,'Schools.csv')
+        OldMaster = PreviousSchoolList(MasterFile=MasterFile)
+        
+        #Read it in
+        OldMaster.ReadFromFile()
+        
+        #Update
+        for i in range(len(self.SchoolList)):
+            
+            School = OldMaster.FindName(self.SchoolList[i].Name)
+            
+            if (School == None):
+                NewSchool = PreviousSchool(self.SchoolList[i].Name,self.SchoolList[i].Location,ZScoreList[i])
+                OldMaster.SchoolList.append(NewSchool)
+            else:
+                School.HistZScore = ZScoreList[i]
+                
+        OldMaster.SortList()
+        OldMaster.WriteToFile()
+        
+        #Write out
         
         
-        #Generate Individual School Report
+
+        
             
     """    
     def PrintFinal(self):

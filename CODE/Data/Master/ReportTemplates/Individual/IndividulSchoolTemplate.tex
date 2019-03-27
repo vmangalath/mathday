@@ -22,6 +22,7 @@
 \newcommand{\SchoolGroupQi}{!SchoolGroupQ9!}
 \newcommand{\SchoolGroupQj}{!SchoolGroupQ10!}
 
+
 \newcommand{\SchoolSwissTotal}{!SchoolSwissTotal!}
 \newcommand{\SchoolSwissQa}{!SchoolSwissQ1!}
 \newcommand{\SchoolSwissQb}{!SchoolSwissQ2!}
@@ -31,7 +32,7 @@
 
 \newcommand{\SchoolCrossTotal}{!SchoolCrossTotal!}
 \newcommand{\SchoolCrossQa}{!SchoolCrossQ1!}
-\newcommand{\SchoolCrossQb}{!SchoolCrossQ21}
+\newcommand{\SchoolCrossQb}{!SchoolCrossQ2!}
 \newcommand{\SchoolCrossQc}{!SchoolCrossQ3!}
 \newcommand{\SchoolCrossQd}{!SchoolCrossQ4!}
 
@@ -62,6 +63,7 @@
 \newcommand\T{\rule{0pt}{4ex }}       % Top table strut
 \newcommand\B{\rule[-2ex]{0pt}{2ex }} % Bottom table strut
 \begin{document}
+\pagenumbering{gobble}
 
 \begin{tabular}{|p{0.333\textwidth}|p{0.333\textwidth}|p{0.334\textwidth}|}
 	\hline
@@ -71,6 +73,7 @@
 	\hline
 \end{tabular}
 
+\vspace{0.5cm}
 
 \fbox{
 \begin{minipage}{\textwidth}
@@ -91,9 +94,13 @@ Group Scores \\
 	\hline
 \end{tabular}
 
+\vspace{0.25cm}
+
 Total :  \SchoolGroupTotal
 \end{minipage}
 }
+
+\vspace{0.5cm}
 
 \fbox{
 \begin{minipage}{\textwidth}
@@ -107,9 +114,14 @@ Swiss Scores
 	\SchoolSwissQa & \SchoolSwissQb & \SchoolSwissQc & \SchoolSwissQd & \SchoolSwissQe   \T\B\\
 	\hline
 \end{tabular}
+
+\vspace{0.25cm}
+
 Total :  \SchoolSwissTotal
 \end{minipage}
 }
+
+\vspace{0.5cm}
 
 \fbox{
 \begin{minipage}{\textwidth}
@@ -124,9 +136,13 @@ Cross Scores
 	\hline
 \end{tabular}
 
+\vspace{0.25cm}
+
 Total :  \SchoolCrossTotal
 \end{minipage}
 }
+
+\vspace{0.5cm}
 
 \fbox{
 \begin{minipage}{\textwidth}
@@ -155,6 +171,9 @@ Relay Scores
 	\SchoolRelayQp & \SchoolRelayQq & \SchoolRelayQr & \SchoolRelayQs & \SchoolRelayQt   \T\B\\
 	\hline
 \end{tabular}
+
+\vspace{0.25cm}
+
 Total :  \SchoolRelayTotal
 \end{minipage}
 }

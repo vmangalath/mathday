@@ -1,13 +1,13 @@
 Name,Location,Historical Z-Score
-Abbotsleigh,Country,-0.189999998
-Batemans Bay High School,Country,-1.1597687
-Bega High School,Country,-0.0141234994
-Bishop Tyrrell Anglican College,City,-0.415523291
-Bla blah High,City,0
-Bomaderry High School,Country,-0.699910641
+Abbotsleigh,Country,2.29376638359
+Batemans Bay High School,Country,-1.28939530439
+Bega High School,Country,-0.637911361118
+Bishop Tyrrell Anglican College,City,-0.203588732272
+Bla blah High,City,0.0
+Bomaderry High School,Country,-0.637911361118
 Bombala High School,Country,-1.37
 Bowral High School,Country,-0.77332747
-Braidwood Central School,Country,-0.731809735
+Braidwood Central School,Country,-0.00814354929086
 Brindabella Christian College,City,-0.286672413
 Burgmann Anglican School,City,0.281100661
 Canberra College,City,1.49226046
@@ -26,7 +26,7 @@ Gungahlin College,City,-0.249806851
 Hawker College,City,0.144457996
 Illawarra Grammar School,City,-0.534979641
 Karabar High School,Country,-0.988075674
-Lake Tuggeranong College,City,-0.404649973
+Lake Tuggeranong College,City,0.46961134244
 Leeton High School,Country,-0.354556233
 Lumen Christi Catholic College,City,-1.1347369
 Marist College,City,0.211330056
@@ -40,7 +40,7 @@ Narooma High School,Country,-0.164218634
 Narrabundah College,City,0.669313431
 Narrabundah College,City,0.764252424
 NewSkool,City,1.1
-Nowra High School,Country,-0.37916398
+Nowra High School,Country,0.0135725821514
 Presbyterian Ladies' College,City,0.180000007
 Queanbeyan High School,Country,-0.853084147
 Radford College,City,1.33148658

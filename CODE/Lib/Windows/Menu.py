@@ -536,7 +536,7 @@ class SingleSchoolContestBody:
     def ChooseSchoolName(self,event=None):
         
         if (self.Validate()):
-            SchoolKeySelectorDialog = SchoolNameSelector(self.root,self.Competition,self.School.Name,self.TitleFont, self.BodyFont)
+            SchoolKeySelectorDialog = SchoolNameSelector(self.root,self.Competition,self.School.Name,self.TitleFont, self.BodyFont,self.ContestName)
             
             #Find Site by School Key
             SchoolFound = self.Competition.FindName(SchoolKeySelectorDialog.SelName)
@@ -546,7 +546,7 @@ class SingleSchoolContestBody:
     def ChooseSchoolKey(self,event=None):
         
         if (self.Validate()):
-            SchoolKeySelectorDialog = SchoolKeySelector(self.root,self.Competition,self.School.Key,self.TitleFont, self.BodyFont)
+            SchoolKeySelectorDialog = SchoolKeySelector(self.root,self.Competition,self.School.Key,self.TitleFont, self.BodyFont,self.ContestName)
             
             #Find Site by School Key
             self.SchoolKey = SchoolKeySelectorDialog.SelKey
@@ -589,6 +589,8 @@ class SwissContestBody:
         
         self.Competition = Competition
         
+        self.ContestName = 'Swiss'
+        
         self.master = master
         self.root = root
         
@@ -596,7 +598,7 @@ class SwissContestBody:
         self.Site = Site
         
         #Check if Round Valid
-        self.SwissPartners = self.Competition.SwissPartnerFindBySite(self.RoundNum ,self.Site)
+        self.SwissPartners = self.Competition.FindSwissSite(self.RoundNum ,self.Site)
         
         
         if (self.SwissPartners == None):
@@ -791,7 +793,7 @@ class SwissContestBody:
             return False
         else:
             
-            if (self.SwissPartners[0].SwissScores[self.RoundNum - 1] + self.SwissPartners[1].SwissScores[self.RoundNum - 1] != self.Competition.ValidSwissScores[self.RoundNum - 1] and (self.SwissPartners[0].SwissScores[self.RoundNum - 1] != 0 or self.SwissPartners[1].SwissScores[self.RoundNum - 1] != 0)):
+            if (self.SwissPartners[0].SwissScores[self.RoundNum - 1] + self.SwissPartners[1].SwissScores[self.RoundNum - 1] != self.Competition.ValidSwissScores[self.RoundNum - 1] and (not self.Competition.AllZerosScores(self.Site,self.ContestName,IsSiteKey=True,RoundNum = self.RoundNum))):
                 string1 = 'Entered Scores for Teams Do Not Add To ' +str(self.Competition.ValidSwissScores[self.RoundNum - 1]) 
                 tkMessageBox.showwarning("Error", string1)
                 return False
@@ -812,7 +814,7 @@ class SwissContestBody:
     def ChooseSchoolName(self,Key,event=None):
         
         if (self.Validate()):
-            SchoolKeySelectorDialog = SchoolNameSelector(self.root,self.Competition,Key,self.TitleFont, self.BodyFont)
+            SchoolKeySelectorDialog = SchoolNameSelector(self.root,self.Competition,Key,self.TitleFont, self.BodyFont,self.ContestName,self.RoundNum)
             
             #Find Site by School Key
             SchoolFound = self.Competition.FindName(SchoolKeySelectorDialog.SelName)
@@ -822,7 +824,7 @@ class SwissContestBody:
     def ChooseSchoolKey(self,Key,event=None):
         
         if (self.Validate()):
-            SchoolKeySelectorDialog = SchoolKeySelector(self.root,self.Competition,Key,self.TitleFont, self.BodyFont)
+            SchoolKeySelectorDialog = SchoolKeySelector(self.root,self.Competition,Key,self.TitleFont, self.BodyFont,self.ContestName,self.RoundNum)
             
             #Find Site by School Key
             SchoolFound = self.Competition.FindKey(SchoolKeySelectorDialog.SelKey)
@@ -833,7 +835,7 @@ class SwissContestBody:
         
         if (self.Validate()):
             
-            SiteSelectorDialog = SiteSelector(self.root,self.Competition,self.Site,self.TitleFont, self.BodyFont)
+            SiteSelectorDialog = SiteSelector(self.root,self.Competition,self.Site,self.TitleFont, self.BodyFont,self.ContestName,RoundNum=self.RoundNum)
             
             self.Site = SiteSelectorDialog.SelKey
             self.ReloadScreen()

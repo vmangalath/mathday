@@ -499,7 +499,7 @@ class SwissRoundNumberselector(tk.Toplevel):
 
 class SchoolKeySelector(tk.Toplevel):
 
-    def __init__(self, root,Competition,CurKey,TitleFont, BodyFont, title = 'Select School By Key'):
+    def __init__(self, root,Competition,CurKey,TitleFont, BodyFont,ContestName,RoundNum=1, title = 'Select School By Key'):
         
         self.TitleFont = TitleFont
         self.BodyFont = BodyFont 
@@ -512,6 +512,9 @@ class SchoolKeySelector(tk.Toplevel):
 
         self.root = root
         self.Competition = Competition
+        self.ContestName = ContestName
+        self.RoundNum = RoundNum
+        
         self.CurKey = CurKey
         self.SelKey = self.CurKey
         
@@ -546,9 +549,16 @@ class SchoolKeySelector(tk.Toplevel):
             
             si = itot
             for i in range(si,si + LetterAndNum[1]):
-                KeyName = self.Competition.SchoolList[i].Key
+                KeyName = self.Competition.SchoolList[i].Key   
+                
+                
                 GetValueLoc = partial(self.GetValue,KeyName)
-                ButTemp = tk.Button(self, text=KeyName, width=4, command=GetValueLoc)
+                
+                if( self.Competition.AllZerosScores(KeyName,self.ContestName,False,self.RoundNum)):
+                    ButTemp = tk.Button(self, text=KeyName, width=4, command=GetValueLoc)
+                else:
+                    ButTemp = tk.Button(self, text=KeyName,bg='green', width=4, command=GetValueLoc)
+                    
                 ButTemp.grid(row=RowNum , column=(i - si))
                 itot = itot + 1
             RowNum = RowNum + 1
@@ -580,7 +590,7 @@ class SchoolKeySelector(tk.Toplevel):
         
 class SiteSelector(tk.Toplevel):
 
-    def __init__(self, root,Competition,CurKey,TitleFont, BodyFont, title = 'Select Site'):
+    def __init__(self, root,Competition,CurKey,TitleFont, BodyFont,ContestName,RoundNum=1, title = 'Select Site'):
         
         self.TitleFont = TitleFont
         self.BodyFont = BodyFont 
@@ -593,6 +603,8 @@ class SiteSelector(tk.Toplevel):
 
         self.root = root
         self.Competition = Competition
+        self.ContestName = ContestName
+        self.RoundNum = RoundNum
         self.CurKey = CurKey
         self.SelKey = self.CurKey
         
@@ -630,7 +642,12 @@ class SiteSelector(tk.Toplevel):
                 
                 KeyName = self.Competition.ValidSwissSites[i]
                 GetValueLoc = partial(self.GetValue,KeyName)
-                ButTemp = tk.Button(self, text=KeyName, width=4, command=GetValueLoc)
+                
+                if( self.Competition.AllZerosScores(KeyName,self.ContestName,True,self.RoundNum)):
+                    ButTemp = tk.Button(self, text=KeyName, width=4, command=GetValueLoc)
+                else:
+                    ButTemp = tk.Button(self, text=KeyName,bg='green', width=4, command=GetValueLoc)
+                    
                 ButTemp.grid(row=RowNum , column=(i - si))
                 itot = itot + 1
                 
@@ -664,7 +681,7 @@ class SiteSelector(tk.Toplevel):
 
 class SchoolNameSelector(tk.Toplevel):
 
-    def __init__(self, root,Competition,CurName,TitleFont, BodyFont, title = 'Select School By Name'):
+    def __init__(self, root,Competition,CurName,TitleFont, BodyFont,ContestName,RoundNum=1, title = 'Select School By Name'):
         
         self.TitleFont = TitleFont
         self.BodyFont = BodyFont 
@@ -679,6 +696,9 @@ class SchoolNameSelector(tk.Toplevel):
         self.Competition = Competition
         self.CurName = CurName
         self.SelName = self.CurName
+        
+        self.ContestName = ContestName
+        self.RoundNum = RoundNum
         
 
         body = tk.Frame(self)
@@ -719,6 +739,9 @@ class SchoolNameSelector(tk.Toplevel):
         i = 0
         for School in self.Competition.SchoolList:
             self.ListBox1.insert(i,School.Name)
+            
+            if (not self.Competition.AllZerosScores(School.Key,self.ContestName,False,self.RoundNum)):
+                self.ListBox1.itemconfig(i, bg='green')
             i = i + 1        
    
        
