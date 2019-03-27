@@ -1,3 +1,11 @@
+"""
+--- All Non-GUI Classes ---
+
+    These classes are used by the GUI calls to perform the real work of the program
+
+"""
+
+######--IMPORTS--######
 import csv
 import random
 import copy
@@ -8,29 +16,59 @@ import subprocess
 import os
 from ..Functions.Functions import NextKey,ReplaceTemplate     
 
+
+"""
+    Individual School Classes
+    
+"""
+
 class PreviousSchool:
+    #PreviousSchool is the base class for all individual School classes
     def __init__(self,Name,Location,HistZScore):
+        
+        #PreviousSchool is an object linking 3 variables
+        #   Name - Name of the School
+        #   Location - Location of the School ('City' or 'Country')
+        #   HistZScore - Previous Z Score result (results copied from previous version of ScoreKeeper 2018)
         self.Name = Name
         self.Location = Location
         self.HistZScore = HistZScore
+    
+    #When converted to a string it is just a tuple containung its 3 values    
     def __str__(self):
         return "( %s , %s , %s )" %(self.Name,self.Location,self.HistZScore)
+        
+    #Registers the current school given a 'Key'
     def Register(self,Key):
         return RegisteredSchool(Key,self.Name,self.Location,self.HistZScore)
 
 class RegisteredSchool(PreviousSchool):
+    #RegisteredSchool is child class to PreviousSchool, with the only difference being the existence of a 'Key'
     def __init__(self,Key,Name,Location,HistZScore):
+        #RegisteredSchool is a PreviousSchool with an extra variable
+        #   Key - Key of the School for the Competition (e.g 'A1' is a key), these are unique for each team in a competition
         PreviousSchool.__init__(self,Name,Location,HistZScore)
         self.Key = Key
     def __str__(self):
         return "( %s , %s , %s , %s )" %(self.Key,self.Name,self.Location,self.HistZScore)
+        
+    #Enters the current School into the Competition, making it a CompetitionSchool
     def GenerateCompetitionSchool(self,GroupScores,SwissScores,CrossScores,RelayScores,SwissPartners,SwissSites):
         return CompetitionSchool(self.Key,self.Name,self.Location,self.HistZScore,GroupScores,SwissScores,CrossScores,RelayScores,SwissPartners,SwissSites)
 
 class CompetitionSchool(RegisteredSchool):
+    #CompetitionSchool is a child class of RegisteredSchool containing more quantities again
 
     def __init__(self,Key,Name,Location,HistZScore,GroupScores,SwissScores,CrossScores,RelayScores,SwissPartners,SwissSites):
-        
+        #CompetitionSchool is a RegisteredSchool with extra variables
+        # GroupScores - A list containing all the Scores for the Group Contest
+        # SwissScores - A list containing all the Scores for the Swiss Contest
+        # CrossScores - A list containing all the Scores for the Cross Contest
+        # RelayScores - A list containing all the Scores for the Relay Contest
+        # AllScoreDict - A dictionary with the Contest names as keys and the values as the appropriate Score list
+        # SwissPartners - A list of the Schools Swiss Partners of all rounds
+        # SwissSites - A list of the Schools Swiss Sites for all rounds
+        # Total - a variable that gives the current Score of the School (is be used not just for overall total, but totals in other contests as well)
         RegisteredSchool.__init__(self,Key,Name,Location,HistZScore)
         
         self.GroupScores = GroupScores
@@ -52,16 +90,30 @@ class CompetitionSchool(RegisteredSchool):
     def __str__(self):
         return "( %s , %s , %s , %s , %s , %s , %s , %s , %s , %s )" %(self.Key,self.Name,self.Location,self.HistZScore, self.GroupScores, self.SwissScores, self.CrossScores, self.RelayScores,self.SwissPartners,self.SwissSites)        
 
+    #Produces a list version of the Schools values
     def Listify(self):
         return [self.Key,self.Name,self.Location,self.HistZScore] + self.GroupScores + self.SwissScores + self.CrossScores + self.RelayScores + self.SwissPartners + self.SwissSites
     
+    #checks if all the scores for a given contest are zero, for solo contests (Group,Relay,Cross) this indicates that no scores have been submitted
     def AllZerosScores(self,ContestName):        
         return all(x == 0 for x in self.AllScoreDict[ContestName])
    
+    #Updates the Total variable for a given number of contests
     def TotalUpdate(self,ContestString=['A']):
         
-        
+        #reset the Total value
         self.Total = 0
+        
+        #ContestString is a list of strings that determine what contest totals
+        #contribute to the Total
+        
+        # 'G' - All Group Questions
+        # 'G1to8' - Group Questions 1 through 8 (Legacy to keep in line with previous version)
+        # 'S' - All Swiss Rounds
+        # 'SQ<Number>' - <Number> Swiss Round (Q meaning  Question)
+        # 'C' - All Cross Questions
+        # 'R' - All Relay Questions
+        # 'A' - All Questions (Overall Total), also breaks out of loop so ['G','A'] will just return the Overall Total and not the Group Total plus the Overall Total
         for Contest in ContestString:
             
             if(Contest == 'G'):
@@ -85,10 +137,13 @@ class CompetitionSchool(RegisteredSchool):
             elif(Contest == 'R'):
                 self.Total = self.Total + sum(self.RelayScores)
             elif(Contest == 'A'):
-                self.Total = self.Total + sum(self.GroupScores) + sum(self.SwissScores) + sum(self.CrossScores) + sum(self.RelayScores)
+                self.Total = sum(self.GroupScores) + sum(self.SwissScores) + sum(self.CrossScores) + sum(self.RelayScores)
                 break
-            
+    
+    #Writes a Schools Report for the Competition     
     def WriteReport(self,TemplateFile,SchoolFile):
+        
+        #Uses ReplaceTemplate defined in Functions.py (Lib/Functions/Functions.Py)
         
         #Generate Dictionary for Value Names and Values
         AllOutputNames = {
@@ -104,6 +159,8 @@ class CompetitionSchool(RegisteredSchool):
                 
             NewKey = 'School'+ContestKey  + 'Total' 
             AllOutputNames[NewKey] = str(sum(self.AllScoreDict[ContestKey]))
+            
+        #Write File
             
         ReplaceTemplate(TemplateFile,SchoolFile,AllOutputNames)
             
