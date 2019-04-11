@@ -415,7 +415,11 @@ class SingleSchoolContestBody:
         F1f2 = tk.Frame(F1,height=10,width=10, bd=1)
         F1f2.grid(row = 1, column = 0)      
         tk.Label(F1f2, text='',width=4,bd = 4, font=self.BodyFont).grid(row = 0, column = 0)
-        tk.Label(F1f2, text='Scores',width=10,bd = 4, font=self.TitleFont).grid(row = 1, column = 0)
+    
+        if (ContestName == 'Cross'):
+            tk.Label(F1f2, text='Ticks',width=10,bd = 4, font=self.TitleFont).grid(row = 1, column = 0)
+        else:
+            tk.Label(F1f2, text='Scores',width=10,bd = 4, font=self.TitleFont).grid(row = 1, column = 0)
         
         F1f3 = tk.Frame(F1,height=10,width=10, bd=1)
         F1f3.grid(row = 2, column = 0)

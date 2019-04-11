@@ -133,11 +133,13 @@ class CompetitionSchool(RegisteredSchool):
             elif(Contest == 'SQ5'):
                 self.Total = self.Total + self.SwissScores[4]
             elif(Contest == 'C'):
-                self.Total = self.Total + sum(self.CrossScores)
+                #self.CrossScores is just the number of ticks, the actual score 4 times the number of ticks
+                self.Total = self.Total + 4*sum(self.CrossScores)
             elif(Contest == 'R'):
                 self.Total = self.Total + sum(self.RelayScores)
             elif(Contest == 'A'):
-                self.Total = sum(self.GroupScores) + sum(self.SwissScores) + sum(self.CrossScores) + sum(self.RelayScores)
+                #self.CrossScores is just the number of ticks, the actual score 4 times the number of ticks
+                self.Total = sum(self.GroupScores) + sum(self.SwissScores) + 4*sum(self.CrossScores) + sum(self.RelayScores)
                 break
     
     #Writes a Schools Report for the Competition     
@@ -158,7 +160,12 @@ class CompetitionSchool(RegisteredSchool):
                 AllOutputNames[NewKey] = str(self.AllScoreDict[ContestKey][i])
                 
             NewKey = 'School'+ContestKey  + 'Total' 
-            AllOutputNames[NewKey] = str(sum(self.AllScoreDict[ContestKey]))
+            
+            if(ContestKey == 'Cross'):
+                #Cross final scores multiplies by 4
+                AllOutputNames[NewKey] = str(4*sum(self.AllScoreDict[ContestKey]))
+            else:
+                AllOutputNames[NewKey] = str(sum(self.AllScoreDict[ContestKey]))
             
         #Write File
             
