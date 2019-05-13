@@ -18,5 +18,8 @@ MedTitleFont = tkFont.Font(family='Courier', size=14)
 BodyFont = tkFont.Font(family='Courier', size=10) 
 
 
+root.option_add("*Font", BodyFont)
+
+
 Menu1 = LoadMainMenu(root,LargeTitleFont,MedTitleFont,BodyFont)
 root.mainloop()
