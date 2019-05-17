@@ -280,9 +280,9 @@ class RegisterSchoolList:
          return len(filter(lambda School: School.Name == Name, self.SchoolList)) != 0
     def ValidKeyOrder(self):
         self.SortList()
-        PrevKey = 'A0'
+        PrevKey = self.SchoolList[0].Key
         Result = True
-        for School in self.SchoolList:
+        for School in self.SchoolList[1:]:
             Result = Result and NextKey(School.Key,PrevKey)
             PrevKey = School.Key
         return Result
@@ -633,26 +633,10 @@ class CompetitionSchoolList:
         
 
     def PrintFinal(self):
-        print('Final')
         
         #Get School Totals and put in rank order
         self.UpdateTotalsSchool(['A'])    
         self.SortListScores()
-        
-        #Get Statistics
-        
-        #Get Scores
-        Scores = []
-        for School in self.SchoolList:
-            print(School.Name)
-            Scores.append(School.Total)
-            
-        ScoreMean = numpy.mean(Scores)
-        ScoreStd = numpy.std(Scores)
-        ZScores = scipy.stats.zscore(Scores)
-        
-        #Update Master File
-        self.UpdateMasterFile(ZScores)
             
         SchoolReportDir = os.path.join(self.FinalReportsDir, 'IndividualSchoolReports')
             
@@ -749,7 +733,22 @@ class CompetitionSchoolList:
             if not File.endswith(".pdf"):
                 os.remove(os.path.join(OverallReportsDir, File))
         
-    def UpdateMasterFile(self,ZScoreList):
+    def UpdateMasterFile(self):
+        
+        #Get School Totals and put in rank order
+        self.UpdateTotalsSchool(['A'])    
+        self.SortListScores()
+        
+        #Get Statistics
+        
+        #Get Scores
+        Scores = []
+        for School in self.SchoolList:
+            Scores.append(School.Total)
+            
+        ZScores = scipy.stats.zscore(Scores)
+    
+        
         MasterFile = os.path.join(self.MasterDir,'Schools.csv')
         OldMaster = PreviousSchoolList(MasterFile=MasterFile)
         
@@ -765,12 +764,10 @@ class CompetitionSchoolList:
                 NewSchool = PreviousSchool(self.SchoolList[i].Name,self.SchoolList[i].Location,ZScoreList[i])
                 OldMaster.SchoolList.append(NewSchool)
             else:
-                School.HistZScore = ZScoreList[i]
+                School.HistZScore = ZScores[i]
                 
         OldMaster.SortList()
         OldMaster.WriteToFile()
-        
-        #Write out
         
         
 

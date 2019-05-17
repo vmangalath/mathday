@@ -28,6 +28,7 @@ def IsKey(Key):
         return ((Key[0] in string.ascii_uppercase) and ((int(Key[1:]) < 100) and (int(Key[1:]) > 0)) )
     except TypeError:
         return False
+    
 
 def NextKey(Key,PrevKey):
     #Function checks if 'Key' and 'PrevKey' are successive keys, returns True if they are and false otherwise
