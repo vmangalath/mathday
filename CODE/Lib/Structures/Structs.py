@@ -514,7 +514,7 @@ class CompetitionSchoolList:
     def PossibleSwissSites(self):
         self.SortList()
         self.ValidSwissSites = []
-        for i in range(1,len(self.SchoolList),2):
+        for i in range(0,len(self.SchoolList),2):
             self.ValidSwissSites.append(self.SchoolList[i].Key)
 
     def HowManyLettersInSites(self):
