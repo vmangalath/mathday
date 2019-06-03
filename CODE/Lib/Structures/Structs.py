@@ -34,7 +34,7 @@ class PreviousSchool:
         self.Location = Location
         self.HistZScore = HistZScore
 
-    #When converted to a string it is just a tuple containung its 3 values
+    #When converted to a string it is just a tuple containing its 3 values
     def __str__(self):
         return "( %s , %s , %s )" %(self.Name,self.Location,self.HistZScore)
 
@@ -514,7 +514,7 @@ class CompetitionSchoolList:
     def PossibleSwissSites(self):
         self.SortList()
         self.ValidSwissSites = []
-        for i in range(0,len(self.SchoolList),2):
+        for i in range(1,len(self.SchoolList),2):
             self.ValidSwissSites.append(self.SchoolList[i].Key)
 
     def HowManyLettersInSites(self):
@@ -549,7 +549,7 @@ class CompetitionSchoolList:
             SwissSites.append((Site,Schools))
         return SwissSites
 
-    def PrintSwissPartners(self,RoundNum):
+    def PrintSwissPartnersCSV(self,RoundNum):
 
         SwissSites = self.GetSwissPartnersBySite(RoundNum)
 
@@ -572,6 +572,30 @@ class CompetitionSchoolList:
                 writefile.writerow(['',str(Site[1][1].Key),str(Site[1][1].Name)])
                 writefile.writerow(['','',''])
 
+    def PrintSwissPartners(self,RoundNum):
+
+        SwissSites = self.GetSwissPartnersBySite(RoundNum)
+
+        SwissSitesDir = os.path.join(self.CompDataDir,'SwissSites')
+
+        if (not os.path.exists(SwissSitesDir)):
+            os.makedirs(SwissSitesDir)
+
+        FileName = os.path.join(SwissSitesDir,"SwissRound" + str(RoundNum)+ ".txt")
+
+        with open(FileName ,'w') as file1:
+            #writefile = csv.writer(file1, delimiter = ',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+
+            file1.write('Round ' + str(RoundNum) +'\n')
+            file1.write('\n')
+            file1.write('Site   Keys   School Names \n \n')
+
+            for Site in SwissSites:
+                file1.write('%2s     %2s     %s  \n' % (str(Site[0]), str(Site[1][0].Key), str(Site[1][0].Name)) )
+                file1.write( '       %2s     %s  \n' %  (str(Site[1][1].Key), str(Site[1][1].Name)) )
+                file1.write('\n')
+
+
 
 
     def GenerateSwissPartners(self,RoundNum):
@@ -579,9 +603,7 @@ class CompetitionSchoolList:
         #Clear Previous Swiss Data
         self.ClearAllSwiss(RoundNum)
 
-        #U sed to just use Group Scores 1 through 8
-        #ContestString = ['G1to8']
-        # Now use all Group Scores
+        #Take Group Scores
         ContestString = ['G']
 
 
@@ -601,9 +623,6 @@ class CompetitionSchoolList:
 
         SwissSites = copy.deepcopy(self.ValidSwissSites)
 
-        #print SwissSites.sort
-        print SwissSites
-
         #Find Partners
         for School in self.SchoolList:
 
@@ -613,7 +632,8 @@ class CompetitionSchoolList:
                         for SchoolPartner in self.SchoolList:
 
                             if (SchoolPartner != School and (not SwissPairsListInst.SchoolPaired(SchoolPartner.Key)) and SchoolPartner.Key not in School.SwissPartners[i:]):
-                                SiteKey = random.choice(SwissSites)
+                                #SiteKey = random.choice(SwissSites)
+                                SiteKey = SwissSites[0]
                                 SwissSites.remove(SiteKey)
                                 SwissPairsListInst.SwissPairsList.append(SwissPair(SiteKey,School.Key,SchoolPartner.Key))
                                 break
