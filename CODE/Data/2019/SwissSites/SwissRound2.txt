@@ -1,0 +1,58 @@
+Round 2
+
+Site   Keys   School Names 
+ 
+A1     A6     Narrabundah College  
+       B8     St Edmund's College  
+
+A3     A1     Radford College  
+       B5     Merici College  
+
+A5     B9     Southern Highlands Christian  
+       D8     Canberra College  
+
+A7     A4     Daramalan College  
+       C8     Narrabundah College 2  
+
+A9     A8     Dickson College  
+       C7     Marist College  
+
+B2     B3     Orana  
+       D3     Lake Ginninderra College  
+
+B4     A2     Canberra Grammar  
+       A9     Moruya High School  
+
+B6     B4     St Frances Xavier College  
+       B7     Canberra College 2  
+
+B8     B2     Trinity Christian School 2  
+       D5     Brindabella Christian College  
+
+C1     C9     Sydney Technical High School 2  
+       D4     Bishop Tyrrell Anglican 3  
+
+C3     A5     Canberra Girls Grammar  
+       D7     Lake Tuggeranong College  
+
+C5     A7     Trinity Christian School  
+       C1     Moruya High School 2  
+
+C7     B1     Melba Copland Secondary  
+       C6     Burgmann Anglican  
+
+C9     A3     Sydney Technical High School  
+       D2     Erindale College  
+
+D2     C2     Hawker College  
+       C3     St Clare's College  
+
+D4     B6     Bishop Tyrrell Anglican 2  
+       D9     Burgmann Anglican 2  
+
+D6     C5     Bishop Tyrrell Anglican  
+       D1     Bomaderry High School 2  
+
+D8     C4     Bomaderry High School  
+       D6     Lake Ginninderra College 2  
+
