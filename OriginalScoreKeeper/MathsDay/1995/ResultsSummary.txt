@@ -1,2 +1,0 @@
-"Year","NameT1","NameT2","NameT3","NameCity1","NameCountry1","NameGraph","NameMaths","NameOverall"
-1995,"Lake Tuggeranong College      ","Sydney Tech. High School      ","Marist College                ","Canberra Girls Grammar        ","Yass High School              ","Monaro High School            ","Sydney Tech. High School      ","Sydney Tech. High School      "

@@ -1,2 +1,0 @@
-"Year","NameT1","NameT2","NameT3","NameCity1","NameCountry1","NameGraph","NameMaths","NameOverall"
-2013,"Gungahlin College","Narrabundah College","Daramalan College 1"," "," ","Daramalan College 2","St Clare's College","Daramalan College 2"

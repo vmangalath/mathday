@@ -1,0 +1,2 @@
+"Year","NameT1","NameT2","NameT3","NameCity1","NameCountry1","NameGraph","NameMaths","NameOverall"
+2006,"Lake Ginninderra College","Narrabundah College","Hawker College","Lake Ginninderra College","Karabar High School","Bega High School","Canberra Girls Grammar","Hawker College"

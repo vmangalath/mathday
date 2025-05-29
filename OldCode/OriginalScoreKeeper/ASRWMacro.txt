@@ -1,0 +1,18 @@
+Sub PrintAllSchoolsRep()
+'
+' PrintAllSchoolsRep Macro
+' Macro recorded 11/03/99 by MooseMan
+'
+        Documents.Open FileName:="ASRMaster.doc", ConfirmConversions:=False, _
+        ReadOnly:=False, AddToRecentFiles:=False, PasswordDocument:="", _
+        PasswordTemplate:="", Revert:=False, WritePasswordDocument:="", _
+        WritePasswordTemplate:="", Format:=wdOpenFormatAuto
+        With ActiveDocument.MailMerge
+        .Destination = wdSendToPrinter
+        On Error GoTo bye
+        .Execute
+    End With
+bye:
+    ' ActiveDocument.Save
+    Application.Quit (OriginalFormat)
+End Sub

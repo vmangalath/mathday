@@ -1,2 +1,0 @@
-"Year","NameT1","NameT2","NameT3","NameCity1","NameCountry1","NameGraph","NameMaths","NameOverall"
-2007,"Hawker College","Canberra Grammar","Sydney Tech. High School","Hawker College","Snowy Mountains Grammar","Sydney Tech. High School","Canberra Grammar","Bega High School"

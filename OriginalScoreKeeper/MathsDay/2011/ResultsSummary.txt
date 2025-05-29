@@ -1,2 +1,0 @@
-"Year","NameT1","NameT2","NameT3","NameCity1","NameCountry1","NameGraph","NameMaths","NameOverall"
-2011,"Sydney Tech. High School 1","Canberra Grammar 1","Narrabundah College 2","Sydney Tech. High School 1","Chevalier College"," "," "," "

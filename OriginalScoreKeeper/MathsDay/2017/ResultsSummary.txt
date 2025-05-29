@@ -1,2 +1,0 @@
-"Year","NameT1","NameT2","NameT3","NameCity1","NameCountry1","NameGraph","NameMaths","NameOverall"
-2017,"Canberra College 1","Sydney Tech. High 2","Sydney Tech High  1","Chevalier College 1","Monaro High School"," "," "," "

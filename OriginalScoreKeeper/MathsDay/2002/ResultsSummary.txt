@@ -1,2 +1,0 @@
-"Year","NameT1","NameT2","NameT3","NameCity1","NameCountry1","NameGraph","NameMaths","NameOverall"
-2002,"Sydney Tech. High School","Marist College","Daramalan College","Daramalan College","Bega Valley Christian College","Daramalan College","Moruya High School","Moruya High School"

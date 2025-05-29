@@ -1,0 +1,2 @@
+"Year","NameT1","NameT2","NameT3","NameCity1","NameCountry1","NameGraph","NameMaths","NameOverall"
+2004,"Marist College","Radford College","Copland College","Lake Tuggeranong College","Batemans Bay High School","Lake Ginninderra College","Copland College","Canberra Girls Grammar"

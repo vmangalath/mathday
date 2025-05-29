@@ -1,2 +1,0 @@
-"Year","NameT1","NameT2","NameT3","NameCity1","NameCountry1","NameGraph","NameMaths","NameOverall"
-2010,"Narrabundah College","Canberra Grammar 1","Hawker College","St Edmund's College","Bomaderry High School","Canberra Girls Grammar","Sydney Tech. High School B","Trinity Christian School"

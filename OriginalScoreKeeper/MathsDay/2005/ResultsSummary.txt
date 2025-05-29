@@ -1,2 +1,0 @@
-"Year","NameT1","NameT2","NameT3","NameCity1","NameCountry1","NameGraph","NameMaths","NameOverall"
-2005,"Marist College","Hawker College Blue","Sydney Tech. High School","Hawker College Blue","Bowral High School"," "," "," "

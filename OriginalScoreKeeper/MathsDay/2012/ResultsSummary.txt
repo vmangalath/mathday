@@ -1,2 +1,0 @@
-"Year","NameT1","NameT2","NameT3","NameCity1","NameCountry1","NameGraph","NameMaths","NameOverall"
-2012,"Sydney Tech. High School","Canberra College 1","Burgmann Anglican School 1"," "," "," "," "," "

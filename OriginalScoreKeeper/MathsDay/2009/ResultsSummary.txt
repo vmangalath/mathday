@@ -1,2 +1,0 @@
-"Year","NameT1","NameT2","NameT3","NameCity1","NameCountry1","NameGraph","NameMaths","NameOverall"
-2009,"Narrabundah College 1","Marist College Canberra 1","Burgmann Anglican School","Burgmann Anglican School","Moss Vale High School","Bega High School","Moss Vale High School","St Clare's College"

@@ -1,2 +1,0 @@
-"Year","NameT1","NameT2","NameT3","NameCity1","NameCountry1","NameGraph","NameMaths","NameOverall"
-2008,"Canberra College Woden","Marist College","Canberra Grammar","Canberra College Woden","Monaro High School","Moruya High School","Radford College","Canberra Grammar"

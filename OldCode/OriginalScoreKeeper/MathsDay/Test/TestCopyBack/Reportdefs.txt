@@ -1,0 +1,8 @@
+"Top Schools Overall Trophy Number","10"
+"Top Schools Overall Trophy Scores","3"
+"Top Schools Overall Shield Number","6"
+"Top Schools Overall Shield Scores","0"
+"Top City & Country Report Number","10"
+"Top City & Country Report Scores","3"
+"Individual Schools City and Country Ranks","10"
+"Individual Schools Overall Ranks","20"
