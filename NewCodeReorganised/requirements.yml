@@ -1,0 +1,10 @@
+name: mathday-scorekeeper
+channels:
+  - defaults
+dependencies:
+  - python>=3.8
+  - numpy
+  - pandas
+  - pip
+  - pip:
+      - tk 
